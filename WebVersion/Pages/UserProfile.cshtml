@@ -1,0 +1,83 @@
+﻿@page
+@model WebVersion.Pages.UserProfileModel
+@{
+}
+
+<html>
+    <head>
+    <link rel="stylesheet" type="text/css" href="~/css/UserProfileStyle.css" asp-append-version="true" />
+    </head>
+    <body>
+        <div class="MainContainer">
+
+            <div class="Container1">
+
+                <div class="UserInformContainer">
+
+                    <div class="NickAndPictureContainer">
+
+                        <img src="Images/OldPif.jpg" alt="Отсутствует">
+
+                        <div class="LabelAndInput">
+
+                            <label class="UserLabel">Никнейм</label>
+                            <input type="text"/>
+
+                        </div>
+
+                    </div>
+
+                    <div class="ChangePasswordContainer">
+
+                        <div>
+
+                            <label class="UserLabel" id="ChangePassword">Изменить пароль</label>
+
+                        </div>
+
+                        <div class="LabelAndInput">
+
+                            <label class="UserLabel">Текущий пароль</label>
+                            <input type="text"/>
+
+                        </div>
+
+                        <div class="LabelAndInput">
+
+                            <label class="UserLabel">Новый пароль</label>
+                            <input type="text"/>
+
+                        </div>
+
+                        <div class="LabelAndInput">
+
+                            <label class="UserLabel">Повторить новый пароль</label>
+                            <input type="text"/>
+
+                        </div>
+
+                    </div>
+
+                    <button class="SaveButton">Сохранить</button>
+
+                </div>
+
+                <button class="DeleteAccButton">Удалить аккаунт</button>
+
+
+            </div>
+
+
+            <div class="SettingsContainer">
+
+                <label class="UserLabel">Настройки</label>
+
+                <button>О AnTrap</button>
+
+                <button>Центр поддержки</button>
+
+            </div>
+
+        </div>
+    </body>
+</html> 

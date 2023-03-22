@@ -1,0 +1,95 @@
+﻿.Page {
+    display: flex;
+    height: 89.5vh;
+    align-items: center;
+    justify-content: center;
+}
+
+.AuthorizationBox {
+    display: grid;
+    grid-template-rows: auto auto auto;
+    background-color: #1D252A;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+.AuthorizationBox .Authorization {
+    grid-row: 1;
+    font-size: 40px;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    margin: 10px;
+}
+
+.AuthorizationBox .AuthAndRegist {
+    grid-row: 2;
+    text-align: left;
+    margin: 10px;
+}
+
+.AuthorizationBox .AuthAndRegist .SwitchButton1 {
+    font-size: 24px;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: transparent;
+    border: 0px;
+}
+
+.AuthorizationBox .AuthAndRegist .SwitchButton2 {
+    font-size: 24px;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: transparent;
+    border: 0px;
+    border-bottom: thick solid white;
+}
+
+.AuthorizationBox .Content {
+    grid-row: 3;
+    display: grid;
+    grid-template-rows: auto auto auto auto;
+    font-size: 16px;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    align-content: center;
+    margin: 10px;
+}
+
+.AuthorizationBox .Content .NicknameOrEmail {
+    grid-row: 1;
+    display: grid;
+    grid-template-rows: auto auto;
+    margin: 10px;
+}
+
+.AuthorizationBox .Content .Password1 {
+    grid-row: 2;
+    display: grid;
+    grid-template-rows: auto auto;
+    margin: 10px;
+}
+
+.AuthorizationBox .Content .Password2 {
+    grid-row: 3;
+    display: grid;
+    grid-template-rows: auto auto;
+    margin: 10px;
+}
+
+.AuthorizationBox .Content .RegistrButton {
+    grid-row: 4;
+    font-size: 20px;
+    background-color: #218136;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 10px;
+    margin-top: 50px;
+    border: 0px;
+}
+
+input {
+    font-size: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: 350px;
+}

@@ -1,0 +1,54 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="~/css/IndexStyle.css"/>
+    </head>
+    <body>
+
+        <div class="Page">
+
+            <div class="AuthorizationBox">
+
+                <div class="Authorization">
+                    <label>Авторизация</label>
+                </div>
+
+                <div class="AuthAndRegist">
+                    <button class="SwitchButton1">Вход</button>
+                    <button class="SwitchButton2">Регистрация</button>
+                </div>
+
+                <div class="Content">
+
+                    <div class="NicknameOrEmail">
+                        <label>Никнейм или email</label>
+                        <input type="text" />
+                    </div>
+
+                    <div class="Password1">
+                        <label>Пароль</label>
+                        <input type="text" />
+                    </div>
+
+                    <div class="Password2">
+                        <label>Повторите пароль</label>
+                        <input type="text" />
+                    </div>
+
+                    <button class="RegistrButton">Регистрация</button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </body>
+</html>
+
