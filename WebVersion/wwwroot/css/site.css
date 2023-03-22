@@ -1,13 +1,12 @@
 body {
-    display: grid;
-    grid-template-rows: auto 1fr auto;
+    display: flex;
+    flex-direction: column;
+    grid-template-rows: auto auto auto;
     margin: 0px;
     background-color: black;
 }
 
 .Navigation-Bar {
-    grid-row: 1;
-    grid-column: 1;
     display: grid;
     grid-template-columns: 0.8fr auto auto;
     column-gap: 1%;
@@ -17,18 +16,28 @@ body {
 
     .Navigation-Bar .Main-Label {
         grid-column: 1;
-        grid-row: 1;
         margin: 0px;
         margin-left: 100px;
     }
 
+        .Navigation-Bar .Main-Label label {
+            font-size: 40px;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .Navigation-Bar .Main-Label button {
+            background-color: #1D252A;
+            border-color: white;
+            color: white;
+        }
+
     .Navigation-Bar .Buttons {
         grid-column: 2;
-        grid-row: 1;
         align-content: end;
     }
 
-        .Navigation-Bar .Buttons .Bar-Button {
+        .Navigation-Bar .Buttons button {
             background-color: #1D252A;
             border-color: white;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -41,41 +50,24 @@ body {
 
     .Navigation-Bar .Day_Night-Theme {
         grid-column: 3;
-        grid-row: 1;
     }
 
+        .Navigation-Bar .Day_Night-Theme svg {
+            max-width: 70px;
+            max-height: 70px;
+        }
+
 .Body-Content {
-    grid-row: 2 / 3;
-    grid-column: 1;
+    height: 89.5vh;
 }
 
 .Navigation-Bar-Bottom {
-    grid-row: 3;
-    grid-column: 1;
     background-color: #1D252A;
 }
 
-
-#AnTrapLabel {
-    font-size: 40px;
-    color: white;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-#SelectButton {
-    background-color: #1D252A;
-    border-color: white;
-    color: white;
-}
-
-#AnTrapLabelBottom {
-    font-size: 20px;
-    color: white;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    margin-left: 100px;
-}
-
-#ThemeSwitch {
-    max-width: 70px;
-    max-height: 70px;
-}
+    .Navigation-Bar-Bottom label {
+        font-size: 20px;
+        color: white;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin-left: 100px;
+    }
