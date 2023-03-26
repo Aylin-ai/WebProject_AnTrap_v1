@@ -7,7 +7,116 @@
 
 <html>
     <head>
-        <link rel="stylesheet" type="text/css" href="~/css/IndexStyle.css"/>
+
+        <style>
+
+        .Page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .AuthorizationBox {
+            display: flex;
+            flex-direction: column;
+            background-color: #1D252A;
+            margin: 10px;
+            border-radius: 10px;
+        }
+
+            .AuthorizationBox .Authorization {
+                font-size: 40px;
+                color: white;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                text-align: center;
+                margin: 10px;
+            }
+
+            .AuthorizationBox .AuthAndRegist {
+                text-align: left;
+                margin: 10px;
+            }
+
+                .AuthorizationBox .AuthAndRegist .SwitchButton {
+                    border: none;
+                    font-size: 24px;
+                    color: white;
+                    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    background-color: transparent;
+                    border: none;
+                    border-bottom: 5px solid transparent;
+                }
+
+                    .AuthorizationBox .AuthAndRegist .SwitchButton:hover {
+                        border-bottom: 5px solid white;
+                    }
+
+                    .AuthorizationBox .AuthAndRegist .SwitchButton:checked + label {
+                        border-bottom: 5px solid white;
+                    }
+
+                .AuthorizationBox .AuthAndRegist #tab-btn-1 {
+                    display: none;
+                }
+
+                .AuthorizationBox .AuthAndRegist #tab-btn-2 {
+                    display: none;
+                }
+
+        #tab-btn-1:checked ~ #Authorization,
+        #tab-btn-2:checked ~ #Registration {
+            display: flex;
+        }
+
+        .AuthorizationBox .AuthAndRegist .Content {
+            display: none;
+            flex-direction: column;
+            font-size: 16px;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            align-content: center;
+            margin: 10px;
+        }
+
+
+            .AuthorizationBox .AuthAndRegist .Content .NicknameOrEmail {
+                display: flex;
+                flex-direction: column;
+                margin: 10px;
+            }
+
+            .AuthorizationBox .AuthAndRegist .Content .Password1 {
+                display: flex;
+                flex-direction: column;
+                margin: 10px;
+            }
+
+            .AuthorizationBox .AuthAndRegist .Content .Password2 {
+                display: flex;
+                flex-direction: column;
+                margin: 10px;
+            }
+
+            .AuthorizationBox .AuthAndRegist .Content .RegistrButton {
+                font-size: 20px;
+                background-color: #218136;
+                color: white;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                margin: 10px;
+                margin-top: 50px;
+                border: 0px;
+            }
+
+            .AuthorizationBox .AuthAndRegist .Content input {
+                font-size: 20px;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                width: 350px;
+            }
+
+
+        </style>
+
     </head>
 <body>
 
@@ -20,28 +129,55 @@
             </div>
 
             <div class="AuthAndRegist">
-                <button class="SwitchButton">Вход</button>
-                <button class="SwitchButton">Регистрация</button>
-            </div>
+                <input type="radio" name="tab-btn" id="tab-btn-1" class="SwitchButton" value="" checked>
+                <label class="SwitchButton" for="tab-btn-1">Вход</label>
+                <input type="radio" name="tab-btn" id="tab-btn-2" class="SwitchButton" value="">
+                <label class="SwitchButton" for="tab-btn-2">Регистрация</label>
 
-            <div class="Content">
+                <div class="Content" id="Registration">
 
-                <div class="LabelAndInput">
-                    <label>Никнейм или email</label>
-                    <input type="text" />
+                    <form method="post" asp-action="Registration">
+
+                        <div class="NicknameOrEmail">
+                            <label>Никнейм или email</label>
+                            <input type="text" name="Login" />
+                        </div>
+
+                        <div class="Password1">
+                            <label>Пароль</label>
+                            <input type="password" name="Password1" />
+                        </div>
+
+                        <div class="Password2">
+                            <label>Повторите пароль</label>
+                            <input type="password" name="Password2" />
+                        </div>
+
+                        <input type="submit" class="RegistrButton" value="Регистрация">
+
+                    </form>
+
                 </div>
 
-                <div class="Password1">
-                    <label>Пароль</label>
-                    <input type="text" />
-                </div>
+                <div class="Content" id="Authorization">
 
-                <div class="Password2">
-                    <label>Повторите пароль</label>
-                    <input type="text" />
-                </div>
+                    <form method="post" asp-action="Authorization">
 
-                <button class="RegistrButton">Регистрация</button>
+                        <div class="NicknameOrEmail">
+                            <label>Никнейм или email</label>
+                            <input type="text" name="Login" />
+                        </div>
+
+                        <div class="Password1">
+                            <label>Пароль</label>
+                            <input type="password" name="Password1" />
+                        </div>
+
+                        <input type="submit" class="RegistrButton" value="Вход">
+
+                    </form>
+
+                </div>
 
             </div>
 
