@@ -7,6 +7,8 @@ body {
 }
 
 .Navigation-Bar {
+    position:sticky;
+    top: 0px;
     display: grid;
     grid-template-columns: 0.8fr auto auto;
     column-gap: 1%;
@@ -58,16 +60,5 @@ body {
         }
 
 .Body-Content {
-    height: 89.5vh;
+    margin: 30px;
 }
-
-.Navigation-Bar-Bottom {
-    background-color: #1D252A;
-}
-
-    .Navigation-Bar-Bottom label {
-        font-size: 20px;
-        color: white;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        margin-left: 100px;
-    }

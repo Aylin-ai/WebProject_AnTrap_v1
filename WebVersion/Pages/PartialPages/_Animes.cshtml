@@ -1,0 +1,39 @@
+﻿@using ShikimoriSharp.Bases
+@model WebVersion.Pages.MainAnimePageModel
+
+@{
+        for (int i = 0; i < Model.AnimeList.Count; i++)
+        {
+            <div class="AnimeContainer">
+
+                <div class="PictureAndListContainer">
+
+                    <img src=@("https://shikimori.one")@Model.AnimeList[i].Image.Original alt="Отсутствует">
+
+                    <select>
+                        <option value="1">Нет</option>
+                        <option value="2">Смотрю</option>
+                        <option value="3">В планах</option>
+                        <option value="4">Брошено</option>
+                        <option value="5">Просмотрено</option>
+                        <option value="6">Любимые</option>
+                    </select>
+
+                </div>
+
+                <a asp-page="UserProfile">
+                    <div class="AnimeInformation">
+                        <label id="AnimeName">@Model.AnimeList[i].Russian</label>
+                        <label id="AnimeEnglishName">@Model.AnimeList[i].Name</label>
+                        <label class="OtherInformation">@Model.AnimeList[i].Kind @("/") @Model.AnimeList[i].Status</label>
+                        <label class="OtherInformation">@("Оценка:") @Model.AnimeList[i].Score</label>
+                    </div>
+                </a>
+
+            </div>
+
+            <hr>
+        }
+}
+
+

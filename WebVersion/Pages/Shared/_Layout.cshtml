@@ -13,7 +13,7 @@
     <div class="Navigation-Bar">
 
         <div class="Main-Label">
-            <label>AnTrap</label>
+            <a asp-page="MainAnimePage"><label>AnTrap</label></a>
             <button>
                 |
             </button>
@@ -40,10 +40,6 @@
 
     <div class="Body-Content">
         @RenderBody()
-    </div>
-
-    <div class="Navigation-Bar-Bottom">
-        <label>C @DateTime.Now.Year AnTrap</label>
     </div>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
