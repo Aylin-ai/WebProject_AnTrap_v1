@@ -95,12 +95,6 @@
         margin-top: 50px;
     }
 
-.PictureAndListContainer select {
-    font-size: 20px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    border: none;
-}
-
 .FiltrContainer label {
     border: none;
     border-bottom: 2px solid white;
@@ -131,6 +125,14 @@ input {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: white;
     margin: 5px;
+}
+
+#PagesSelect {
+    font-size: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: 50px;
+    border: none;
+    color: black;
 }
 
 

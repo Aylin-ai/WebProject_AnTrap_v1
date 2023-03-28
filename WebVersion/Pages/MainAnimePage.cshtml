@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "{handler?}/{id?}"
 @using ShikimoriSharp.Classes
 @model WebVersion.Pages.MainAnimePageModel
 @{
@@ -6,7 +6,7 @@
     {
         for (int i = 0; i < Model.AnimeList.Count; i++)
         {
-            <div class="AnimeContainer">
+            <div class="AnimeContainer" id="@Model.AnimeList[i].Id">
 
                 <div class="PictureAndListContainer">
 
@@ -51,7 +51,9 @@
 
         <div class="Container1">
 
-            <a asp>--></a>
+        <form method="get" asp-page-handler="AnimesById">
+            <select id="PagesSelect" asp-for="Id" asp-items="@Model.PagesId" onchange="this.form.submit()"></select>
+        </form>
 
             @AnimeRender();
             
