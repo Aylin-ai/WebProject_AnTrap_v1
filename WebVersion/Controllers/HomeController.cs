@@ -34,8 +34,9 @@ namespace WebVersion.Controllers
             return View();
         }
 
-        public IActionResult MainAnimePage(int? id)
+        public IActionResult MainAnimePage()
         {
+            ViewBag.Order = 1;
             return View();
         }
 

@@ -1,16 +1,16 @@
-﻿@page "{handler?}/{id?}"
+﻿@page
 @using ShikimoriSharp.Classes
 @model WebVersion.Pages.MainAnimePageModel
 @{
-    async Task AnimeRender()
+    async Task GetAnimes()
     {
         for (int i = 0; i < Model.AnimeList.Count; i++)
         {
-            <div class="AnimeContainer" id="@Model.AnimeList[i].Id">
+            <div class="AnimeContainer">
 
                 <div class="PictureAndListContainer">
 
-                    <img src="@("https://shikimori.one")@Model.AnimeList[i].Image.Original" alt="Отсутствует">
+                    <img src=@("https://shikimori.one")@Model.AnimeList[i].Image.Original alt="Отсутствует">
 
                     <select>
                         <option value="1">Нет</option>
@@ -25,7 +25,6 @@
 
                 <a asp-page="UserProfile">
                     <div class="AnimeInformation">
-
                         <label id="AnimeName">@Model.AnimeList[i].Russian</label>
                         <label id="AnimeEnglishName">@Model.AnimeList[i].Name</label>
                         <label class="OtherInformation">@Model.AnimeList[i].Kind @("/") @Model.AnimeList[i].Status</label>
@@ -51,11 +50,7 @@
 
         <div class="Container1">
 
-        <form method="get" asp-page-handler="AnimesById">
-            <select id="PagesSelect" asp-for="Id" asp-items="@Model.PagesId" onchange="this.form.submit()"></select>
-        </form>
-
-            @AnimeRender();
+            @GetAnimes();
             
         </div>
 
@@ -64,57 +59,47 @@
 
             <label class="FiltrLabel">Настройки</label>
 
-            <div class="LabelAndInput">
+            <form method="post" asp-page-handler="AnimesById">
 
-                <label class="FiltrLabel">Жанры</label>
-                <select class="multiple-select" multiple>
-                    <option value="1"></option>
-                    <option value="2">Фантастика</option>
-                    <option value="3">Фентези</option>
-                    <option value="4">Перерождение</option>
-                    <option value="5">Повседневность</option>
-                </select>
+                <div class="LabelAndInput">
+                    <label class="FiltrLabel">Жанры</label>
+                    <select asp-for="Genre" asp-items="@Model.AnimeGenres" onchange="this.form.submit()"></select>
+                </div>
 
-            </div>
+                <div class="LabelAndInput">
+                    <label class="FiltrLabel">Статус</label>
+                    <select asp-for="Status" asp-items="@Model.AnimeStatuses" onchange="this.form.submit()"></select>
+                </div>
 
-            <div class="LabelAndInput">
+                <div class="LabelAndInput">
+                    <label class="FiltrLabel">Тип</label>
+                    <select asp-for="Type" asp-items="@Model.AnimeTypes" onchange="this.form.submit()" ></select>
+                </div>
 
-                <label class="FiltrLabel">Тип</label>
-                <select class="multiple-select" multiple>
-                    <option value="1"></option>
-                    <option value="2">Аниме-сериал</option>
-                    <option value="3">Аниме-фильм</option>
-                    <option value="4">OVA</option>
-                </select>
+                <div class="LabelAndInput">
+                    <label class="FiltrLabel">Выбор страницы</label>
+                    <select id="PagesSelect" asp-for="Id" asp-items="@Model.PagesId" onchange="this.form.submit()"></select>
+                </div>
 
-            </div>
+                <div class="LabelAndInput">
 
-            <div class="LabelAndInput">
+                    <label class="FiltrLabel">Сортировка</label>
 
-                <label class="FiltrLabel">Статус</label>
-                <select class="multiple-select" multiple>
-                    <option value="1"></option>
-                    <option value="2">Вышел</option>
-                    <option value="3">Онгоинг</option>
-                </select>
+                    <select asp-for="Order" onchange="this.form.submit()">
+                        <option value="1">По рейтингу</option>
+                        <option value="2">По типу</option>
+                        <option value="3">По популярности</option>
+                        <option value="4">По имени</option>
+                        <option value="5">По дате релиза</option>
+                        <option value="6">По статусу</option>
+                        <option value="7">Случайно</option>
+                    </select>
 
-            </div>
+                </div>
 
-            <div class="LabelAndInput">
+            </form>
 
-                <label class="FiltrLabel">Сортировка</label>
-                <select>
-                    <optgroup label="Рейтинг">
-                        <option value="1">По возрастанию</option>
-                        <option value="2">По убыванию</option>
-                    </optgroup>
-                    <optgroup label="Дата выхода">
-                        <option value="3">По возрастанию</option>
-                        <option value="4">По убыванию</option>
-                    </optgroup>
-                </select>
-
-            </div>
+            
 
         </div>
 
@@ -123,45 +108,6 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
-    <script type="text/javascript">
-    //    $(function () {
-
-    //        $('div#loading').hide();
-
-    //        var page = 0;
-    //        var _inCallback = false;
-    //        function loadItems() {
-    //            if (page > -1 && !_inCallback) {
-    //                _inCallback = true;
-    //                page++;
-    //                $('div#loading').show();
-
-    //                $.ajax({
-    //                    type: 'GET',
-    //                    url: '/Home/Index/' + page,
-    //                    success: function (data, textstatus) {
-    //                        if (data != '') {
-    //                            $("#scrolList").append(data);
-    //                        }
-    //                        else {
-    //                            page = -1;
-    //                        }
-    //                        _inCallback = false;
-    //                        $("div#loading").hide();
-    //                    }
-    //                });
-    //            }
-    //        }
-    //        // обработка события скроллинга
-    //        $(window).scroll(function () {
-    //            if ($(window).scrollTop() == $(document).height() - $(window).height()) {
-
-    //                loadItems();
-    //            }
-    //        });
-    //    })
-    </script>
 
 </body>
 </html>
