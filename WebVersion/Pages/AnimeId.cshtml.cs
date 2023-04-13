@@ -5,6 +5,7 @@ using ShikimoriSharp.Bases;
 using ShikimoriSharp;
 using WebVersion.Models;
 using ShikimoriSharp.Classes;
+using ShikimoriSharp.AdditionalRequests;
 
 namespace WebVersion.Pages
 {
@@ -15,6 +16,8 @@ namespace WebVersion.Pages
         [BindProperty(Name = "animeId", SupportsGet = true)]
         public int AnimeId { get; set; }
         public AnimeID? Anime { get; set; }
+        public Related?[] RelatedAnime { get; set; }
+        public Anime[] SimilarAnime { get; set; }
 
         public AnimeIdModel()
         {
@@ -25,6 +28,8 @@ namespace WebVersion.Pages
         {
             var client = new ShikimoriClient(logger, new ClientSettings("ShikiOAuthTest", APIToken.clientID, APIToken.clientSecret));
             Anime = await client.Animes.GetAnime(AnimeId);
+            RelatedAnime = await client.Animes.GetRelated(AnimeId);
+            SimilarAnime = await client.Animes.GetSimilar(AnimeId);
             if (Anime == null)
             {
                 return NotFound();
