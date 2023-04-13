@@ -23,14 +23,15 @@
 
                 </div>
 
-                <a asp-page="UserProfile">
+                <form method="post" asp-page="AnimeId">
                     <div class="AnimeInformation">
                         <label id="AnimeName">@Model.AnimeList[i].Russian</label>
                         <label id="AnimeEnglishName">@Model.AnimeList[i].Name</label>
                         <label class="OtherInformation">@Model.AnimeList[i].Kind @("/") @Model.AnimeList[i].Status</label>
                         <label class="OtherInformation">@("Оценка:") @Model.AnimeList[i].Score</label>
                     </div>
-                </a>
+                    <input type="submit" value="Подробнее" asp-page-handler="AnimeIdPage" asp-route-id="@Model.AnimeList[i].Id" />
+                </form>
 
             </div>
 

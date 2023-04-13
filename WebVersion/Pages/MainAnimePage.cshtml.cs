@@ -13,6 +13,7 @@ namespace WebVersion.Pages
     public class MainAnimePageModel : PageModel
     {
         public int Id { get; set; } = 1;
+        public int AnimeId { get; set; }
         public ShikimoriSharp.Enums.Order Order { get; set; } = ShikimoriSharp.Enums.Order.ranked;
         private IHttpClientFactory _httpClientFactory;
         private ILogger logger;
@@ -120,6 +121,11 @@ namespace WebVersion.Pages
             Status = status;
             Genre = genre;
             await GetAnimes(Id, Order, Type, Status, Genre);
+        }
+
+        public IActionResult OnPostAnimeIdPage(int id)
+        {
+            return RedirectToPage("/AnimeId", new { animeId = id });
         }
     }
 }
