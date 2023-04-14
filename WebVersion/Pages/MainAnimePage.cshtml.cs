@@ -67,10 +67,13 @@ namespace WebVersion.Pages
 
         public async Task GetAnimes(int page, ShikimoriSharp.Enums.Order order, string type = "", string status = "", int genre = 0)
         {
-            var client = new ShikimoriClient(logger, new ClientSettings("ShikiOAuthTest", APIToken.clientID, APIToken.clientSecret));
+            HttpClient httpClient = _httpClientFactory.CreateClient();
+            httpClient.BaseAddress = new Uri("https://shikimori.me");
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("User-Agent", "ShikiOAuthTest");
+
 
             Anime[] search;
-            var genres = await client.Genres.GetGenres();
+            var genres = await httpClient.GetFromJsonAsync<Genre[]>("/api/genres");
             AnimeGenres.Add(new SelectListItem { Value = "0", Text = "Âñ¸" });
             for (int i = 0; i < genres.Length; i++)
             {
@@ -78,27 +81,12 @@ namespace WebVersion.Pages
             }
             if (genre == 0)
             {
-                search = await client.Animes.GetAnime(new ShikimoriSharp.Settings.AnimeRequestSettings
-                {
-                    limit = 50,
-                    order = order,
-                    page = page,
-                    kind = type,
-                    status = status,
-                });
+                search = await httpClient.GetFromJsonAsync<Anime[]>($"/api/animes?limit=50&order={order}&page={page}&kind={type}&status={status}");
             }
             else
             {
-                int[] genresId = { genre };
-                search = await client.Animes.GetAnime(new ShikimoriSharp.Settings.AnimeRequestSettings
-                {
-                    limit = 50,
-                    order = order,
-                    page = page,
-                    kind = type,
-                    status = status,
-                    genre = genresId,
-                });
+                string apiRequest = $"/api/animes?limit=50&order={order}&page={page}&kind={type}&status={status}&genre={genre}";
+                search = await httpClient.GetFromJsonAsync<Anime[]>(apiRequest);
             }
             AnimeList = search.ToList();
         }

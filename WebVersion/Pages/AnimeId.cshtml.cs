@@ -11,7 +11,7 @@ namespace WebVersion.Pages
 {
     public class AnimeIdModel : PageModel
     {
-        private ILogger logger;
+        private IHttpClientFactory _httpClientFactory;
 
         [BindProperty(Name = "animeId", SupportsGet = true)]
         public int AnimeId { get; set; }
@@ -19,17 +19,21 @@ namespace WebVersion.Pages
         public Related?[] RelatedAnime { get; set; }
         public Anime[] SimilarAnime { get; set; }
 
-        public AnimeIdModel()
+        public AnimeIdModel(IHttpClientFactory httpClientFactory)
         {
-
+            _httpClientFactory = httpClientFactory;
         }
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var client = new ShikimoriClient(logger, new ClientSettings("ShikiOAuthTest", APIToken.clientID, APIToken.clientSecret));
-            Anime = await client.Animes.GetAnime(AnimeId);
-            RelatedAnime = await client.Animes.GetRelated(AnimeId);
-            SimilarAnime = await client.Animes.GetSimilar(AnimeId);
+            HttpClient httpClient = _httpClientFactory.CreateClient();
+            httpClient.BaseAddress = new Uri("https://shikimori.me");
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("User-Agent", "ShikiOAuthTest");
+
+            Anime = await httpClient.GetFromJsonAsync<AnimeID>($"/api/animes/{AnimeId}");
+            Anime.Screens = await httpClient.GetFromJsonAsync<Screenshots[]>($"/api/animes/{AnimeId}/screenshots");
+            RelatedAnime = await httpClient.GetFromJsonAsync<Related[]>($"/api/animes/{AnimeId}/related");
+            SimilarAnime = await httpClient.GetFromJsonAsync<Anime[]>($"/api/animes/{AnimeId}/similar");
             if (Anime == null)
             {
                 return NotFound();

@@ -11,170 +11,177 @@
 </head>
 <body>
 
-    <div class="Container1">
+    <div class="Page">
 
-        <div>
-            <div>
-                <img src=@("https://shikimori.one")@Model.Anime.Image.Original alt="Отсутствует">
-                <select>
-                    <option value="1">Нет</option>
-                    <option value="2">Смотрю</option>
-                    <option value="3">В планах</option>
-                    <option value="4">Брошено</option>
-                    <option value="5">Просмотрено</option>
-                    <option value="6">Любимые</option>
-                </select>
-            </div>
+        <div class="Container1">
 
-            <div>
-                <div class="LabelAndInput">
-                    <label>Рейтинг: </label>
-                    <label>@Model.Anime.Score</label>
+            <div class="MainInformation">
+                <div class="ImageAndSelect">
+                    <img src=@("https://shikimori.me")@Model.Anime.Image.Original alt="Отсутствует">
+                    <select>
+                        <option value="1">Нет</option>
+                        <option value="2">Смотрю</option>
+                        <option value="3">В планах</option>
+                        <option value="4">Брошено</option>
+                        <option value="5">Просмотрено</option>
+                        <option value="6">Любимые</option>
+                    </select>
                 </div>
-                <div class="LabelAndInput">
-                    <label>@Model.Anime.Russian</label>
-                </div>
-                <div class="LabelAndInput">
-                    <label>@Model.Anime.Name</label>
-                </div>
-                <div class="LabelAndInput">
-                    <label>Тип: </label>
-                    <label>@Model.Anime.Kind</label>
-                </div>
-                <div class="LabelAndInput">
-                    <label>Статус: </label>
-                    <label>@Model.Anime.Status</label>
-                </div>
-                <div class="LabelAndInput">
-                    <label>Студии: </label>
-                    @foreach (var studio in Model.Anime.Studios)
-                    {
-                        <label class="FiltrLabel">@studio.Name @(" ")</label>
-                    }
-                </div>
-                <div class="LabelAndInput">
-                    <label>Количество серий: </label>
-                    <label>@Model.Anime.Episodes</label>
-                </div>
-                <div class="LabelAndInput">
-                    <label class="FiltrLabel">Жанры: </label>
-                    @foreach (var genre in Model.Anime.Genres)
-                    {
-                        <label class="FiltrLabel">@genre.Russian @(" ")</label>
-                    }
-                </div>
-                <div class="LabelAndInput">
-                    <label>Длительность: </label>
-                    <label>@Model.Anime.Duration</label>
-                </div>
-            </div>
-        </div>
 
-        <div>
-            <label>@Model.Anime.Description</label>
-            <hr />
-
-            <div>
-                <label>Скриншоты</label>
-                <div>
-                    @foreach(var screen in Model.Anime.Screens)
-                    {
-                        <img src=@("https://shikimori.one")@screen.Preview alt="Отсутствует">
-                    }
-                </div>
-            </div>
-
-            <div>
-                <label>Связанное</label>
-                <div>
-                    @for (int i = 0; i < Model.RelatedAnime.Length; i++)
-                    {
-                        if (Model.RelatedAnime[i].Anime != null)
+                <div class="AnimeIdInformation">
+                    <div class="LabelAndInput">
+                        <label id="AnimeIdName">@Model.Anime.Russian</label>
+                    </div>
+                    <div class="LabelAndInput">
+                        <label id="AnimeIdEnglishName">@Model.Anime.Name</label>
+                    </div>
+                    <div class="LabelAndInput">
+                        <label>Рейтинг: </label>
+                        <label>@Model.Anime.Score</label>
+                    </div>
+                    <div class="LabelAndInput">
+                        <label>Тип: </label>
+                        <label>@Model.Anime.Kind</label>
+                    </div>
+                    <div class="LabelAndInput">
+                        <label>Статус: </label>
+                        <label>@Model.Anime.Status</label>
+                    </div>
+                    <div class="LabelAndInput">
+                        <label>Студии: </label>
+                        @foreach (var studio in Model.Anime.Studios)
                         {
-                            <div>
-                                <img scr=@("https://shikimori.one")@Model.RelatedAnime[i]. alt="Отсутствует" />
-                                <div>
-                                    <div class="FiltrLabel">
-                                        <label>@Model.RelatedAnime[i].Anime.Russian@("/")</label>
-                                        <label>@Model.RelatedAnime[i].Anime.Name</label>
-                                    </div>
-                                    <label>@Model.RelatedAnime[i].Anime.Kind@("/")@Model.RelatedAnime[i].Anime.ReleasedOn@("/")@Model.RelatedAnime[i].Anime.Status</label>
-                                    <div class="FiltrLabel">
-                                        <label>Оценка: </label>
-                                        <label>@Model.RelatedAnime[i].Anime.Score</label>
-                                    </div>
-                                    <select>
-                                        <option value="1">Нет</option>
-                                        <option value="2">Смотрю</option>
-                                        <option value="3">В планах</option>
-                                        <option value="4">Брошено</option>
-                                        <option value="5">Просмотрено</option>
-                                        <option value="6">Любимые</option>
-                                    </select>
-                                </div>
-                            </div>
+                            <label class="FiltrLabel">@studio.Name @(" ")</label>
                         }
-                        else if (Model.RelatedAnime[i].Manga != null)
+                    </div>
+                    <div class="LabelAndInput">
+                        <label>Количество серий: </label>
+                        <label>@Model.Anime.Episodes</label>
+                    </div>
+                    <div class="LabelAndInput">
+                        <label class="FiltrLabel">Жанры: </label>
+                        @foreach (var genre in Model.Anime.Genres)
                         {
-                            <div>
-                                <img scr=@("https://shikimori.one")@Model.RelatedAnime[i].Manga.Image.Original alt="Отсутствует" />
-                                <div>
-                                    <div class="FiltrLabel">
-                                        <label>@Model.RelatedAnime[i].Manga.Russian@("/")</label>
-                                        <label>@Model.RelatedAnime[i].Manga.Name</label>
-                                    </div>
-                                    <label>@Model.RelatedAnime[i].Manga.Kind@("/")@Model.RelatedAnime[i].Manga.ReleasedOn@("/")@Model.RelatedAnime[i].Manga.Status</label>
-                                    <div class="FiltrLabel">
-                                        <label>Оценка: </label>
-                                        <label>@Model.RelatedAnime[i].Manga.Score</label>
-                                    </div>
-                                    <select>
-                                        <option value="1">Нет</option>
-                                        <option value="2">Читаю</option>
-                                        <option value="3">В планах</option>
-                                        <option value="4">Брошено</option>
-                                        <option value="5">Просмотрено</option>
-                                        <option value="6">Любимые</option>
-                                    </select>
-                                </div>
-                            </div>
+                            <label class="FiltrLabel">@genre.Russian @(" ")</label>
                         }
-
-                    }
+                    </div>
+                    <div class="LabelAndInput">
+                        <label>Длительность: </label>
+                        <label>@Model.Anime.Duration</label>
+                    </div>
                 </div>
+            </div>
+
+            <div>
+                <label id="Description">@Model.Anime.Description</label>
+                <hr>
+
+                <div>
+                    <label>Скриншоты</label>
+                    <div class="Screens">
+                        @for (int i = 0; i < 4; i++)
+                        {
+                            <img src=@("https://shikimori.me")@Model.Anime.Screens[i].Preview alt="Отсутствует">
+                        }
+                    </div>
+                </div>
+
+                <div class="OtherAnimes">
+                    <label>Связанное</label>
+                    <div class="Related">
+                        @for (int i = 0; i < Model.RelatedAnime.Length; i++)
+                        {
+                            if (Model.RelatedAnime[i].Anime != null)
+                            {
+                                <div class="RelatedAnime">
+                                    <div class="ImageAndSelect">
+                                        <img scr=@("https://shikimori.me")@Model.RelatedAnime[i].Anime.Image.Preview alt="Отсутствует">
+                                        <select>
+                                            <option value="1">Нет</option>
+                                            <option value="2">Смотрю</option>
+                                            <option value="3">В планах</option>
+                                            <option value="4">Брошено</option>
+                                            <option value="5">Просмотрено</option>
+                                            <option value="6">Любимые</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <div class="FiltrLabel">
+                                            <label>@Model.RelatedAnime[i].Anime.Russian</label>
+                                        </div>
+                                        <label>@Model.RelatedAnime[i].Anime.Kind@("/")@Model.RelatedAnime[i].Anime.ReleasedOn@("/")@Model.RelatedAnime[i].Anime.Status</label>
+                                        <div class="FiltrLabel">
+                                            <label>Оценка: </label>
+                                            <label>@Model.RelatedAnime[i].Anime.Score</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else if (Model.RelatedAnime[i].Manga != null)
+                            {
+                                <div class="RelatedManga">
+                                    <div class="ImageAndSelect">
+                                        <img scr=@("https://shikimori.me")@Model.RelatedAnime[i].Manga.Image.Preview alt="Отсутствует">
+                                        <select>
+                                            <option value="1">Нет</option>
+                                            <option value="2">Смотрю</option>
+                                            <option value="3">В планах</option>
+                                            <option value="4">Брошено</option>
+                                            <option value="5">Просмотрено</option>
+                                            <option value="6">Любимые</option>
+                                        </select>
+                                    </div>                                    
+                                    <div>
+                                        <div class="FiltrLabel">
+                                            <label>@Model.RelatedAnime[i].Manga.Russian</label>
+                                        </div>
+                                        <label>@Model.RelatedAnime[i].Manga.Kind@("/")@Model.RelatedAnime[i].Manga.ReleasedOn@("/")@Model.RelatedAnime[i].Manga.Status</label>
+                                        <div class="FiltrLabel">
+                                            <label>Оценка: </label>
+                                            <label>@Model.RelatedAnime[i].Manga.Score</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                        }
+                    </div>
                 
-                <label>Похожее</label>
-                <div>
-                    @if (Model.SimilarAnime.Length != 0)
-                    {
-                        for (int i = 0; i < 5; i++)
+                    <label>Похожее</label>
+                    <div class="Similar">
+                        @if (Model.SimilarAnime.Length != 0)
                         {
-                            <div>
-                                <img scr=@("https://shikimori.one")@Model.SimilarAnime[i].Image.Original alt="Отсутствует" />
-                                <div>
-                                    <label>@Model.SimilarAnime[i].Russian@("/")@Model.SimilarAnime[i].Name</label>
-                                    <label>@Model.SimilarAnime[i].Kind@("/")@Model.SimilarAnime[i].ReleasedOn.ToString().Split(' ')[0]@("/")@Model.SimilarAnime[i].Status</label>
-                                    <div class="FiltrLabel">
-                                        <label>Оценка: </label>
-                                        <label>@Model.SimilarAnime[i].Score</label>
+                            for (int i = 1; i <= 5; i++)
+                            {
+                                <div class="SimilarAnime">
+                                    <div class="ImageAndSelect">
+                                        <img scr=@("https://shikimori.me")@Model.SimilarAnime[i].Image.Preview alt="Отсутствует">
+                                        <select>
+                                            <option value="1">Нет</option>
+                                            <option value="2">Читаю</option>
+                                            <option value="3">В планах</option>
+                                            <option value="4">Брошено</option>
+                                            <option value="5">Просмотрено</option>
+                                            <option value="6">Любимые</option>
+                                        </select>
                                     </div>
-                                    <select>
-                                        <option value="1">Нет</option>
-                                        <option value="2">Читаю</option>
-                                        <option value="3">В планах</option>
-                                        <option value="4">Брошено</option>
-                                        <option value="5">Просмотрено</option>
-                                        <option value="6">Любимые</option>
-                                    </select>
+                                    <div class="SimilarAnimeInformation">
+                                        <label>@Model.SimilarAnime[i].Russian</label>
+                                        <label>@Model.SimilarAnime[i].Kind@("/")@Model.SimilarAnime[i].ReleasedOn@("/")@Model.SimilarAnime[i].Status</label>
+                                        <div class="FiltrLabel">
+                                            <label>Оценка: </label>
+                                            <label>@Model.SimilarAnime[i].Score</label>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
+                            }
                         }
-                    }
+                    </div>
                 </div>
+
             </div>
 
         </div>
-
     </div>
 
 </body>
