@@ -1,25 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
-using ShikimoriSharp.Bases;
-using ShikimoriSharp;
-using WebVersion.Models;
-using ShikimoriSharp.Classes;
 using ShikimoriSharp.AdditionalRequests;
+using ShikimoriSharp.Classes;
 
 namespace WebVersion.Pages
 {
-    public class AnimeIdModel : PageModel
+    public class MangaIdModel : PageModel
     {
         private IHttpClientFactory _httpClientFactory;
 
-        [BindProperty(Name = "animeId", SupportsGet = true)]
-        public int AnimeId { get; set; }
-        public AnimeID? Anime { get; set; }
+        [BindProperty(Name = "mangaId", SupportsGet = true)]
+        public int Id { get; set; }
+        public MangaID? Manga { get; set; }
         public Related?[] Related { get; set; }
-        public Anime[] Similar { get; set; }
+        public Manga[] Similar { get; set; }
 
-        public AnimeIdModel(IHttpClientFactory httpClientFactory)
+        public MangaIdModel(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }
@@ -30,12 +26,11 @@ namespace WebVersion.Pages
             httpClient.BaseAddress = new Uri("https://shikimori.me");
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("User-Agent", "ShikiOAuthTest");
 
-            Anime = await httpClient.GetFromJsonAsync<AnimeID>($"/api/animes/{AnimeId}");
-            Anime.Screens = await httpClient.GetFromJsonAsync<Screenshots[]>($"/api/animes/{AnimeId}/screenshots");
-            Related = await httpClient.GetFromJsonAsync<Related[]>($"/api/animes/{AnimeId}/related");
-            Similar = await httpClient.GetFromJsonAsync<Anime[]>($"/api/animes/{AnimeId}/similar");
+            Manga = await httpClient.GetFromJsonAsync<MangaID>($"/api/mangas/{Id}");
+            Related = await httpClient.GetFromJsonAsync<Related[]>($"/api/mangas/{Id}/related");
+            Similar = await httpClient.GetFromJsonAsync<Manga[]>($"/api/mangas/{Id}/similar");
             httpClient.Dispose();
-            if (Anime == null)
+            if (Manga == null)
             {
                 return NotFound();
             }
@@ -46,6 +41,7 @@ namespace WebVersion.Pages
         {
             return RedirectToPage("/AnimeId", new { animeId = id });
         }
+
         public IActionResult OnPostMangaIdPage(int id)
         {
             return RedirectToPage("/MangaId", new { mangaId = id });

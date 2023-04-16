@@ -10,7 +10,7 @@
     width: 100%;
 }
 
-.Container1 {
+.MainContainer {
     display: flex;
     flex-direction: column;
     background-color: #1D252A;
@@ -23,60 +23,39 @@
     display: flex;
 }
 
-.AnimeIdInformation {
-}
 
 .ImageAndSelect {
     display: flex;
     flex-direction: column;
 }
-.ImageAndSelect select {
-    max-width: 250px;
-    margin: 5px;
-}
-.ImageAndSelect img {
-    margin: 10px;
-}
 
-.Screens {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    margin: 5px;
-}
-.Screens img {
-    margin: 5px;
-    max-width: 400px;
-    max-height: 300px;
-}
+    .ImageAndSelect select {
+        max-width: 250px;
+        margin: 5px;
+    }
 
-.Videos {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: left;
-    align-items: flex-start;
-    margin: 5px;
-}
+    .ImageAndSelect img {
+        margin: 10px;
+    }
 
-.OtherAnimes {
+.Other {
     display: flex;
     flex-direction: column;
 }
 
-.OtherAnimes label {
-    font-size: 16px;
-    max-width: 200px;
-}
-.OtherAnimes select {
-    width: 150px;
-}
-.OtherAnimes img {
-    width: 150px;
-    height: 200px;
-}
+    .Other label {
+        font-size: 16px;
+        max-width: 200px;
+    }
+
+    .Other select {
+        width: 150px;
+    }
+
+    .Other img {
+        width: 150px;
+        height: 200px;
+    }
 
 .Related {
     display: flex;
@@ -87,16 +66,17 @@
     margin: 5px;
 }
 
-.Related .RelatedAnime {
-    display: flex;
-    height: 300px;
-    width: 350px
-}
-.Related .RelatedManga {
-    display: flex;
-    height: 300px;
-    width: 350px
-}
+    .Related .RelatedAnime {
+        display: flex;
+        height: 300px;
+        width: 350px
+    }
+
+    .Related .RelatedManga {
+        display: flex;
+        height: 300px;
+        width: 350px
+    }
 
 .Similar {
     display: flex;
@@ -107,15 +87,16 @@
     margin: 5px;
 }
 
-.Similar .SimilarAnime {
-    display: flex;
-    height: 300px;
-    width: 350px
-}
-.Similar .SimilarAnime .SimilarAnimeInformation {
-    display: flex;
-    flex-direction: column;
-}
+    .Similar .SimilarManga {
+        display: flex;
+        height: 300px;
+        width: 350px
+    }
+
+        .Similar .SimilarManga .SimilarMangaInformation {
+            display: flex;
+            flex-direction: column;
+        }
 
 .LabelAndInput {
     display: flex;
@@ -142,12 +123,12 @@ hr {
     margin: 10px;
 }
 
-#AnimeIdEnglishName {
+#MangaEnglishName {
     font-size: 16px;
     margin-top: 1px;
 }
 
-#AnimeIdName {
+#MangaName {
     font-size: 30px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: white;
@@ -166,7 +147,3 @@ hr {
     align-self: center;
 }
 
-#ScreensLabel {
-    font-size: 20px;
-    align-self: center;
-}

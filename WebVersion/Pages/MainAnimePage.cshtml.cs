@@ -89,6 +89,7 @@ namespace WebVersion.Pages
                 search = await httpClient.GetFromJsonAsync<Anime[]>(apiRequest);
             }
             AnimeList = search.ToList();
+            httpClient.Dispose();
         }
 
         public async Task OnPostAnimesById(int id, int order, string type, string status, int genre)

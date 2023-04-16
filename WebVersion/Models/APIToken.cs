@@ -1,9 +1,7 @@
 ﻿using MySql.Data.MySqlClient;
-using MySqlX.XDevAPI;
+using ShikimoriSharp.Bases;
 using System.Data.Common;
-using System.Net.Http;
 using WebVersion.AdditionalClasses;
-using WebVersion.AdditionalClasses.Bases;
 
 namespace WebVersion.Models
 {
@@ -75,16 +73,17 @@ namespace WebVersion.Models
                 strings.ToList().Remove("{");
                 strings.ToList().Remove("}");
                 strings.ToList().Remove(V.ToString());
-                AccessToken accessToken = new AccessToken()
-                {
-                    Access_Token = strings[5],
-                    CreatedAt = strings[32],
-                    ExpiresIn = strings[16],
-                    RefreshToken = strings[21],
-                    Scope = strings[27],
-                    TokenType = strings[11]
-                };
-                return accessToken;
+                //AccessToken accessToken = new AccessToken()
+                //{
+                //    Access_Token = strings[5],
+                //    CreatedAt = strings[32],
+                //    ExpiresIn = strings[16],
+                //    RefreshToken = strings[21],
+                //    Scope = strings[27],
+                //    TokenType = strings[11]
+                //};
+                //return accessToken;
+                return new AccessToken() { };
             }
             catch
             {

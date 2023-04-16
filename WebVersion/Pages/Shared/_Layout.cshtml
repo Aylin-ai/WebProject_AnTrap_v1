@@ -14,9 +14,14 @@
 
         <div class="Main-Label">
             <a asp-page="MainAnimePage"><label>AnTrap</label></a>
-            <button>
-                |
-            </button>
+            <form method="post" action="@Url.Action("Selected", "Home")">
+                <select name="selectedValue" onchange="this.form.submit()">
+                    <option value="0"></option>
+                    <option value="anime">Аниме</option>
+                    <option value="manga">Манга</option>
+                    <option value="ranobe">Ранобэ</option>
+                </select>
+            </form>
         </div>
 
         <div class="Buttons">
@@ -47,5 +52,6 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>

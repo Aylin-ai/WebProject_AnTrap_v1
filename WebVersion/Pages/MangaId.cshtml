@@ -1,0 +1,188 @@
+﻿@page
+@model WebVersion.Pages.MangaIdModel
+
+
+<html>
+<head>
+
+    <link rel="stylesheet" type="text/css" href="~/css/MangaIdStyle.css" asp-append-version="true" />
+
+</head>
+<body>
+
+    <div class="Page">
+
+        <div class="MainContainer">
+
+            <div class="MainInformation">
+                <div class="ImageAndSelect">
+                    <img src=@("https://shikimori.me")@Model.Manga.Image.Original alt="Отсутствует">
+                    <select>
+                        <option value="1">Нет</option>
+                        <option value="2">Смотрю</option>
+                        <option value="3">В планах</option>
+                        <option value="4">Брошено</option>
+                        <option value="5">Просмотрено</option>
+                        <option value="6">Любимые</option>
+                    </select>
+                </div>
+
+                <div class="AnimeIdInformation">
+                    <div class="LabelAndInput">
+                        <label id="MangaName">@Model.Manga.Russian</label>
+                    </div>
+                    <div class="LabelAndInput">
+                        <label id="MangaEnglishName">@Model.Manga.Name</label>
+                    </div>
+                    <div class="LabelAndInput">
+                        <label>Рейтинг: </label>
+                        <label>@Model.Manga.Score</label>
+                    </div>
+                    <div class="LabelAndInput">
+                        <label>Тип: </label>
+                        <label>@Model.Manga.Kind</label>
+                    </div>
+                    <div class="LabelAndInput">
+                        <label>Статус: </label>
+                        <label>@Model.Manga.Status</label>
+                    </div>
+                    <div class="LabelAndInput">
+                        <label>Издатели: </label>
+                        @foreach (var publisher in Model.Manga.Publishers)
+                        {
+                            <label class="FiltrLabel">@publisher.Name @(" ")</label>
+                        }
+                    </div>
+                    <div class="LabelAndInput">
+                        <label>Количество глав: </label>
+                        <label>@Model.Manga.Chapters</label>
+                    </div>
+                    <div class="LabelAndInput">
+                        <label class="FiltrLabel">Жанры: </label>
+                        @foreach (var genre in Model.Manga.Genres)
+                        {
+                            <label class="FiltrLabel">@genre.Russian @(" ")</label>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label id="Description">@Model.Manga.Description</label>
+                <hr>
+
+                <div class="Other">
+                    @if (Model.Related.Length != 0)
+                    {
+                        <label id="RelatedLabel">Связанное</label>
+                        <div class="Related">
+                            @for (int i = 0; i < Model.Related.Length; i++)
+                            {
+                                if (Model.Related[i].Anime != null)
+                                {
+                                    <div class="RelatedAnime">
+                                        <div class="ImageAndSelect">
+                                            <img src=@("https://shikimori.me")@Model.Related[i].Anime.Image.Original alt="Отсутствует">
+                                            <select>
+                                                <option value="1">Нет</option>
+                                                <option value="2">Смотрю</option>
+                                                <option value="3">В планах</option>
+                                                <option value="4">Брошено</option>
+                                                <option value="5">Просмотрено</option>
+                                                <option value="6">Любимые</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <div class="FiltrLabel">
+                                                <label>@Model.Related[i].Anime.Russian</label>
+                                            </div>
+                                            <label>@Model.Related[i].Anime.Kind@("/")@Model.Related[i].Anime.Status</label>
+                                            <div class="FiltrLabel">
+                                                <label>Оценка: </label>
+                                                <label>@Model.Related[i].Anime.Score</label>
+                                            </div>
+                                            <form method="post" asp-page="AnimeId">
+                                                <input type="submit" value="Подробнее" asp-page-handler="AnimeIdPage" asp-route-id="@Model.Related[i].Anime.Id" />
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+                                else if (Model.Related[i].Manga != null)
+                                {
+                                    <div class="RelatedManga">
+                                        <div class="ImageAndSelect">
+                                            <img src=@("https://shikimori.me")@Model.Related[i].Manga.Image.Original alt="Отсутствует">
+                                            <select>
+                                                <option value="1">Нет</option>
+                                                <option value="2">Смотрю</option>
+                                                <option value="3">В планах</option>
+                                                <option value="4">Брошено</option>
+                                                <option value="5">Просмотрено</option>
+                                                <option value="6">Любимые</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <div class="FiltrLabel">
+                                                <label>@Model.Related[i].Manga.Russian</label>
+                                            </div>
+                                            <label>@Model.Related[i].Manga.Kind@("/")@Model.Related[i].Manga.Status</label>
+                                            <div class="FiltrLabel">
+                                                <label>Оценка: </label>
+                                                <label>@Model.Related[i].Manga.Score</label>
+                                            </div>
+                                            <form method="post" asp-page="MangaId">
+                                                <input type="submit" value="Подробнее" asp-page-handler="MangaIdPage" asp-route-id="@Model.Related[i].Manga.Id" />
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+
+                            }
+                        </div>
+                    }
+                    
+                    @if (Model.Similar.Length != 0)
+                    {
+                        <label id="SimilarLabel">Похожее</label>
+                        <div class="Similar">
+                            @if (Model.Similar.Length != 0)
+                            {
+                                for (int i = 0; i < (Model.Similar.Length > 8 ? 8 : Model.Similar.Length); i++)
+                                {
+                                    <div class="SimilarManga">
+                                        <div class="ImageAndSelect">
+                                            <img src=@("https://shikimori.me")@Model.Similar[i].Image.Original alt="Отсутствует">
+                                            <select>
+                                                <option value="1">Нет</option>
+                                                <option value="2">Читаю</option>
+                                                <option value="3">В планах</option>
+                                                <option value="4">Брошено</option>
+                                                <option value="5">Просмотрено</option>
+                                                <option value="6">Любимые</option>
+                                            </select>
+                                        </div>
+                                        <div class="SimilarMangaInformation">
+                                            <label>@Model.Similar[i].Russian</label>
+                                            <label>@Model.Similar[i].Kind@("/")@Model.Similar[i].Status</label>
+                                            <div class="FiltrLabel">
+                                                <label>Оценка: </label>
+                                                <label>@Model.Similar[i].Score</label>
+                                            </div>
+                                            <form method="post" asp-page="MangaId">
+                                                <input type="submit" value="Подробнее" asp-page-handler="MangaIdPage" asp-route-id="@Model.Similar[i].Id" />
+                                            </form>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    }
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>

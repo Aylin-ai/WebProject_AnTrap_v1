@@ -40,6 +40,22 @@ namespace WebVersion.Controllers
             return View();
         }
 
+        public IActionResult Selected(string selectedValue)
+        {
+            switch (selectedValue)
+            {
+                case "anime":
+                    return RedirectToPage("/MainAnimePage");
+                case "manga":
+                    return RedirectToPage("/Manga");
+                case "ranobe":
+                    return RedirectToPage("/Ranobe");
+                default:
+                    return RedirectToPage("/Error");
+            }
+        }
+
+
         //public async Task<IActionResult> AboutAnTrap()
         //{
         //    //var httpClient = _httpClientFactory.CreateClient();

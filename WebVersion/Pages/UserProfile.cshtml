@@ -22,11 +22,18 @@
                         <div class="LabelAndInput">
 
                             <label class="UserLabel">Никнейм</label>
-                            <input type="text"/>
+                            <input type="text" value="@Model.OldLogin"/>
 
                         </div>
 
                     </div>
+
+                <div class="LabelAndInput">
+
+                    <label class="UserLabel">Email</label>
+                    <input type="text" value="@Model.OldEmail" />
+
+                </div>
 
                     <div class="ChangePasswordContainer">
 
@@ -39,7 +46,7 @@
                         <div class="LabelAndInput">
 
                             <label class="UserLabel">Текущий пароль</label>
-                            <input type="text"/>
+                            <input type="text" value="@Model.OldPassword"/>
 
                         </div>
 
@@ -60,6 +67,8 @@
                     </div>
 
                     <button class="SaveButton">Сохранить</button>
+
+                    <label>@Model.ErrorMessage</label>
 
                 </div>
 

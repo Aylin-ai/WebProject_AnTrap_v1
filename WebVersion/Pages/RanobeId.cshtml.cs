@@ -1,25 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
-using ShikimoriSharp.Bases;
-using ShikimoriSharp;
-using WebVersion.Models;
-using ShikimoriSharp.Classes;
 using ShikimoriSharp.AdditionalRequests;
+using ShikimoriSharp.Classes;
+using WebVersion.AdditionalClasses;
 
 namespace WebVersion.Pages
 {
-    public class AnimeIdModel : PageModel
+    public class RanobeIdModel : PageModel
     {
         private IHttpClientFactory _httpClientFactory;
 
-        [BindProperty(Name = "animeId", SupportsGet = true)]
-        public int AnimeId { get; set; }
-        public AnimeID? Anime { get; set; }
+        [BindProperty(Name = "ranobeId", SupportsGet = true)]
+        public int Id { get; set; }
+        public RanobeId? Ranobe { get; set; }
         public Related?[] Related { get; set; }
-        public Anime[] Similar { get; set; }
+        public List<Ranobe> Similar { get; set; }
 
-        public AnimeIdModel(IHttpClientFactory httpClientFactory)
+        public RanobeIdModel(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }
@@ -30,22 +27,28 @@ namespace WebVersion.Pages
             httpClient.BaseAddress = new Uri("https://shikimori.me");
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("User-Agent", "ShikiOAuthTest");
 
-            Anime = await httpClient.GetFromJsonAsync<AnimeID>($"/api/animes/{AnimeId}");
-            Anime.Screens = await httpClient.GetFromJsonAsync<Screenshots[]>($"/api/animes/{AnimeId}/screenshots");
-            Related = await httpClient.GetFromJsonAsync<Related[]>($"/api/animes/{AnimeId}/related");
-            Similar = await httpClient.GetFromJsonAsync<Anime[]>($"/api/animes/{AnimeId}/similar");
+            Ranobe = await httpClient.GetFromJsonAsync<RanobeId>($"/api/ranobe/{Id}");
+            Related = await httpClient.GetFromJsonAsync<Related[]>($"/api/ranobe/{Id}/related");
+            IEnumerable<Ranobe> similar = await httpClient.GetFromJsonAsync<List<Ranobe>>($"/api/ranobe/{Id}/similar");
+            Similar = similar.Where(x => x.Kind != "manga").ToList();
             httpClient.Dispose();
-            if (Anime == null)
+            if (Ranobe == null)
             {
                 return NotFound();
             }
             return Page();
         }
 
+        public IActionResult OnPostRanobeIdPage(int id)
+        {
+            return RedirectToPage("/RanobeId", new { ranobeId = id });
+        }
+
         public IActionResult OnPostAnimeIdPage(int id)
         {
             return RedirectToPage("/AnimeId", new { animeId = id });
         }
+
         public IActionResult OnPostMangaIdPage(int id)
         {
             return RedirectToPage("/MangaId", new { mangaId = id });
