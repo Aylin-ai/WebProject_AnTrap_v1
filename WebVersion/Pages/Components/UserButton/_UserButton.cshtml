@@ -1,0 +1,76 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model string;
+@{
+}
+
+<style>
+    #UserMenuForm {
+        align-self: center;
+    }
+    #menu {
+        position: absolute;
+        top: 63px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        border: 1px solid black;
+        background-color: #1D252A; 
+    }
+    #menu button {
+        font-size: 16px;
+        color: white;
+        margin: 5px;
+        margin-top: 1px;
+        margin-bottom: 1px;
+        border: none;
+        background-color: transparent;
+    }
+    #menu[aria-hidden="true"] {
+        display: none;
+    }
+
+    #UserImageContainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #menu-toggle {
+        width: 50px;
+        height: 50px;
+    }
+</style>
+
+<form id="UserMenuForm" method="post" action="@Url.Action("SelectionFromUser", "Home")">
+    <div id="UserImageContainer">
+        <img id="menu-toggle" scr=@Model aria-expanded="false" />
+
+        <div id="menu" aria-hidden="true">
+            <button name="selectedValue" action="@Url.Action("SelectionFromUser", "Home")" value="userList">Список</button>
+            <button name="selectedValue" action="@Url.Action("SelectionFromUser", "Home")" value="settings">Настройки</button>
+            <button name="selectedValue" action="@Url.Action("SelectionFromUser", "Home")" value="logout">Выйти</button>
+        </div>
+    </div>
+
+@*    <select style="width: 50px; height: 50px;" name="selectedValue" onchange="this.form.submit()">
+        <option style="background-image:url(@Model); width: 50px; height: 50px;"></option>
+        <option value="userList">Список</option>
+        <option value="settings">Настройки</option>
+        <option value="logout">Выйти</option>
+    </select>*@
+</form>
+
+<script>
+    const menuToggle = document.querySelector('#menu-toggle');
+    const menu = document.querySelector('#menu');
+
+    menuToggle.addEventListener('click', function () {
+        const expanded = menuToggle.getAttribute('aria-expanded') === 'true' || false;
+        menuToggle.setAttribute('aria-expanded', !expanded);
+        menu.setAttribute('aria-hidden', expanded);
+    });
+</script>

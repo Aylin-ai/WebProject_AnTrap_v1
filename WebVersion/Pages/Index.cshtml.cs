@@ -14,8 +14,7 @@ namespace WebVersion.Pages
         private readonly ILogger<IndexModel> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         public string ErrorMessage { get; set; }
-        [BindProperty]
-        public bool RememberMe { get; set; }
+        public string UserImageSrc { get; set; }
 
         public IndexModel(ILogger<IndexModel> logger, IHttpContextAccessor httpContextAccessor)
         {
@@ -84,10 +83,11 @@ namespace WebVersion.Pages
                         await cmd.ExecuteNonQueryAsync();
 
                         var claims = new List<Claim>
-                        {
-                            new Claim(ClaimTypes.Name, Login),
-                            new Claim(ClaimTypes.Role, "User")
-                        };
+                    {
+                        new Claim(ClaimTypes.Name, $"{Login}"),
+                        new Claim(ClaimTypes.UserData, $"{UserImageSrc}"),
+                        new Claim(ClaimTypes.Role, "User")
+                    };
 
                         var identity = new ClaimsIdentity(
                             claims, "MyCookieAuthenticationScheme");
@@ -95,7 +95,7 @@ namespace WebVersion.Pages
                         var authProperties = new AuthenticationProperties
                         {
                             IsPersistent = true,
-                            ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(1)
+                            ExpiresUtc = DateTimeOffset.UtcNow.AddMonths(1)
                         };
 
                         var principal = new ClaimsPrincipal(identity);
@@ -156,12 +156,14 @@ namespace WebVersion.Pages
                                 ErrorMessage = "Неправильный логин или пароль";
                                 return Page();
                             }
+                            UserImageSrc = reader.GetString(3);
                         }
                     }
 
                     var claims = new List<Claim>
                     {
-                        new Claim(ClaimTypes.Name, Login),
+                        new Claim(ClaimTypes.Name, $"{Login}"),
+                        new Claim(ClaimTypes.UserData, $"{UserImageSrc}"),
                         new Claim(ClaimTypes.Role, "User")
                     };
 

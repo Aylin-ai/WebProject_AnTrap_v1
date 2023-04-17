@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using System.Web;
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -33,15 +35,13 @@
 
         @if (User.Identity.IsAuthenticated)
         {
-            <div class="Buttons">
-                <a asp-page="UserProfile"><button class="Bar-Button">Профиль</button></a>
-            </div>
+            @await Component.InvokeAsync("UserButton");
         }
         else
         {
             <div class="Buttons">
-                <a asp-page="Index"><button class="Bar-Button">Вход</button></a>
-                <a asp-page="Index"><button class="Bar-Button">Регистрация</button></a>
+                <a asp-page="Index"><button>Вход</button></a>
+                <a asp-page="Index"><button>Регистрация</button></a>
             </div>
         }
 

@@ -32,15 +32,15 @@ namespace WebVersion.Pages
 
                     cmd.Parameters.AddWithValue("@login", User.Identity.Name);
 
-                    var reader = cmd.ExecuteReader();
+                    var reader = await cmd.ExecuteReaderAsync();
 
                     if (reader.HasRows)
                     {
                         while (reader.Read())
                         {
+                            OldImageSource = reader.GetString(3);
                             OldPassword = reader.GetString(1);
                             OldEmail = reader.GetString(2);
-                            OldImageSource = reader.GetString(3);
                         }
                     }
                 }

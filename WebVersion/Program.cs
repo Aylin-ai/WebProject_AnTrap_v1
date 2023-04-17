@@ -16,6 +16,7 @@ builder.Services.AddAuthentication(options =>
 }).AddCookie("MyCookieAuthenticationScheme", options =>
 {
     options.LoginPath = "/Pages/Index";
+    options.LogoutPath = "/Pages/Shared/_Layout";
 });
 
 var app = builder.Build();

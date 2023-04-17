@@ -11,6 +11,9 @@ using ShikimoriSharp.Classes;
 using ShikimoriSharp;
 using WebVersion.Models;
 using WebVersion.Pages;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using WebVersion.AdditionalClasses;
 
 namespace WebVersion.Controllers
 {
@@ -24,21 +27,7 @@ namespace WebVersion.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult UserProfile()
-        {
-            return View();
-        }
-
-        public IActionResult MainAnimePage()
-        {
-            ViewBag.Order = 1;
-            return View();
-        }
+        
 
         public IActionResult Selected(string selectedValue)
         {
@@ -52,6 +41,27 @@ namespace WebVersion.Controllers
                         return RedirectToPage("/Manga");
                     case "ranobe":
                         return RedirectToPage("/Ranobe");
+                    default:
+                        return RedirectToPage("/Error");
+                }
+            }
+            else
+                return RedirectToPage("/Index");
+        }
+
+        public async Task<IActionResult> SelectionFromUser(string selectedValue)
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                switch (selectedValue)
+                {
+                    case "userList":
+                        return RedirectToPage("/MainAnimePage");
+                    case "settings":
+                        return RedirectToPage("/UserProfile");
+                    case "logout":
+                        await HttpContext.SignOutAsync("MyCookieAuthenticationScheme");
+                        return RedirectToPage("/Index");
                     default:
                         return RedirectToPage("/Error");
                 }

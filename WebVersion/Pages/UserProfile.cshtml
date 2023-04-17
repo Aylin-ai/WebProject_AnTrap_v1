@@ -17,12 +17,12 @@
 
                     <div class="NickAndPictureContainer">
 
-                        <img src="Images/OldPif.jpg" alt="Отсутствует">
+                        <img src=@Model.OldImageSource alt="Отсутствует">
 
                         <div class="LabelAndInput">
 
                             <label class="UserLabel">Никнейм</label>
-                            <input type="text" value="@User.Identity.Name"/>
+                            <input type="text" value="@User.Identity.Name.Split(' ')[0]"/>
 
                         </div>
 
