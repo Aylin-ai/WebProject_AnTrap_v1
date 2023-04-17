@@ -17,39 +17,46 @@ namespace WebVersion.Pages
 
         public async Task OnGetAsync()
         {
-            MySqlConnection conn = DBUtils.GetDBConnection();
-            conn.Open();
-            try
+            if (User.Identity.IsAuthenticated)
             {
-                string sql = "select * from userinformation where " +
-                    "UserInformation_Login = @login";
-
-                MySqlCommand cmd = new MySqlCommand();
-                cmd.CommandText = sql;
-                cmd.Connection = conn;
-
-                cmd.Parameters.AddWithValue("@login", OldLogin);
-
-                var reader = cmd.ExecuteReader();
-
-                if (reader.HasRows)
+                MySqlConnection conn = DBUtils.GetDBConnection();
+                conn.Open();
+                try
                 {
-                    while (reader.Read())
+                    string sql = "select * from userinformation where " +
+                        "UserInformation_Login = @login";
+
+                    MySqlCommand cmd = new MySqlCommand();
+                    cmd.CommandText = sql;
+                    cmd.Connection = conn;
+
+                    cmd.Parameters.AddWithValue("@login", User.Identity.Name);
+
+                    var reader = cmd.ExecuteReader();
+
+                    if (reader.HasRows)
                     {
-                        OldPassword = reader.GetString(1);
-                        OldEmail = reader.GetString(2);
-                        OldImageSource = reader.GetString(3);
+                        while (reader.Read())
+                        {
+                            OldPassword = reader.GetString(1);
+                            OldEmail = reader.GetString(2);
+                            OldImageSource = reader.GetString(3);
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    ErrorMessage = ex.Message;
+                }
+                finally
+                {
+                    conn.Close();
+                    conn.Dispose();
+                }
             }
-            catch (Exception ex)
+            else
             {
-                ErrorMessage = ex.Message;
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
+                RedirectToPage("Index");
             }
         }
     }

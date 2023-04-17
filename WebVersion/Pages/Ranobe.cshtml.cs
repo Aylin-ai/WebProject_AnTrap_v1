@@ -46,10 +46,13 @@ namespace WebVersion.Pages
 
         public async Task OnGetAsync()
         {
-            await GetMangas(1, Order);
+            if (User.Identity.IsAuthenticated)
+                await GetRanobe(1, Order);
+            else
+                RedirectToPage("Index");
         }
 
-        public async Task GetMangas(int page, ShikimoriSharp.Enums.Order order, string status = "", int genre = 0)
+        public async Task GetRanobe(int page, ShikimoriSharp.Enums.Order order, string status = "", int genre = 0)
         {
             HttpClient httpClient = _httpClientFactory.CreateClient();
             httpClient.BaseAddress = new Uri("https://shikimori.me");
@@ -92,12 +95,15 @@ namespace WebVersion.Pages
             }
             Status = status;
             Genre = genre;
-            await GetMangas(Id, Order, Status, Genre);
+            await GetRanobe(Id, Order, Status, Genre);
         }
 
         public IActionResult OnPostRanobeIdPage(int id)
         {
-            return RedirectToPage("/RanobeId", new { ranobeId = id });
+            if (User.Identity.IsAuthenticated)
+                return RedirectToPage("/RanobeId", new { ranobeId = id });
+            else
+                return RedirectToPage("Index");
         }
     }
 }

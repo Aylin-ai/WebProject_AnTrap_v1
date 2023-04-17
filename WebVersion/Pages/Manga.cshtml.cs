@@ -57,7 +57,10 @@ namespace WebVersion.Pages
 
         public async Task OnGetAsync()
         {
-            await GetMangas(1, Order);
+            if (User.Identity.IsAuthenticated)
+                await GetMangas(1, Order);
+            else
+                RedirectToPage("Index");
         }
 
         public async Task GetMangas(int page, ShikimoriSharp.Enums.Order order, string type = "", string status = "", int genre = 0)
@@ -109,7 +112,10 @@ namespace WebVersion.Pages
 
         public IActionResult OnPostMangaIdPage(int id)
         {
-            return RedirectToPage("/MangaId", new { mangaId = id });
+            if (User.Identity.IsAuthenticated)
+                return RedirectToPage("/MangaId", new { mangaId = id });
+            else
+                return RedirectToPage("Index");
         }
     }
 }

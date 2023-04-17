@@ -42,17 +42,22 @@ namespace WebVersion.Controllers
 
         public IActionResult Selected(string selectedValue)
         {
-            switch (selectedValue)
+            if (User.Identity.IsAuthenticated)
             {
-                case "anime":
-                    return RedirectToPage("/MainAnimePage");
-                case "manga":
-                    return RedirectToPage("/Manga");
-                case "ranobe":
-                    return RedirectToPage("/Ranobe");
-                default:
-                    return RedirectToPage("/Error");
+                switch (selectedValue)
+                {
+                    case "anime":
+                        return RedirectToPage("/MainAnimePage");
+                    case "manga":
+                        return RedirectToPage("/Manga");
+                    case "ranobe":
+                        return RedirectToPage("/Ranobe");
+                    default:
+                        return RedirectToPage("/Error");
+                }
             }
+            else
+                return RedirectToPage("/Index");
         }
 
 

@@ -22,29 +22,41 @@ namespace WebVersion.Pages
 
         public async Task<IActionResult> OnGetAsync()
         {
-            HttpClient httpClient = _httpClientFactory.CreateClient();
-            httpClient.BaseAddress = new Uri("https://shikimori.me");
-            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("User-Agent", "ShikiOAuthTest");
-
-            Manga = await httpClient.GetFromJsonAsync<MangaID>($"/api/mangas/{Id}");
-            Related = await httpClient.GetFromJsonAsync<Related[]>($"/api/mangas/{Id}/related");
-            Similar = await httpClient.GetFromJsonAsync<Manga[]>($"/api/mangas/{Id}/similar");
-            httpClient.Dispose();
-            if (Manga == null)
+            if (User.Identity.IsAuthenticated)
             {
-                return NotFound();
+                HttpClient httpClient = _httpClientFactory.CreateClient();
+                httpClient.BaseAddress = new Uri("https://shikimori.me");
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("User-Agent", "ShikiOAuthTest");
+
+                Manga = await httpClient.GetFromJsonAsync<MangaID>($"/api/mangas/{Id}");
+                Related = await httpClient.GetFromJsonAsync<Related[]>($"/api/mangas/{Id}/related");
+                Similar = await httpClient.GetFromJsonAsync<Manga[]>($"/api/mangas/{Id}/similar");
+                httpClient.Dispose();
+                if (Manga == null)
+                {
+                    return NotFound();
+                }
+                return Page();
             }
-            return Page();
+            else
+                return RedirectToPage("Index");
         }
+
 
         public IActionResult OnPostAnimeIdPage(int id)
         {
-            return RedirectToPage("/AnimeId", new { animeId = id });
+            if (User.Identity.IsAuthenticated)
+                return RedirectToPage("/AnimeId", new { animeId = id });
+            else
+                return RedirectToPage("Index");
         }
 
         public IActionResult OnPostMangaIdPage(int id)
         {
-            return RedirectToPage("/MangaId", new { mangaId = id });
+            if (User.Identity.IsAuthenticated)
+                return RedirectToPage("/MangaId", new { mangaId = id });
+            else
+                return RedirectToPage("Index");
         }
     }
 }

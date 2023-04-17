@@ -13,7 +13,14 @@
     <div class="Navigation-Bar">
 
         <div class="Main-Label">
-            <a asp-page="MainAnimePage"><label>AnTrap</label></a>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <a asp-page="MainAnimePage"><label>AnTrap</label></a>
+            }
+            else
+            {
+                <a><label>AnTrap</label></a>
+            }
             <form method="post" action="@Url.Action("Selected", "Home")">
                 <select name="selectedValue" onchange="this.form.submit()">
                     <option value="0"></option>
@@ -24,10 +31,19 @@
             </form>
         </div>
 
-        <div class="Buttons">
-            <a asp-page="Index"><button class="Bar-Button">Вход</button></a>
-            <a asp-page="Index"><button class="Bar-Button">Регистрация</button></a>
-        </div>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="Buttons">
+                <a asp-page="UserProfile"><button class="Bar-Button">Профиль</button></a>
+            </div>
+        }
+        else
+        {
+            <div class="Buttons">
+                <a asp-page="Index"><button class="Bar-Button">Вход</button></a>
+                <a asp-page="Index"><button class="Bar-Button">Регистрация</button></a>
+            </div>
+        }
 
         <div class="Day_Night-Theme">
             <a asp-page="UserProfile">
