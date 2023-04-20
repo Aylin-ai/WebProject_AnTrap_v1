@@ -11,14 +11,17 @@
 
                     <img src=@("https://shikimori.me")@Model.List[i].Image.Original alt="Отсутствует">
 
-                    <select>
-                        <option value="1">Нет</option>
-                        <option value="2">Смотрю</option>
-                        <option value="3">В планах</option>
-                        <option value="4">Брошено</option>
-                        <option value="5">Просмотрено</option>
-                        <option value="6">Любимые</option>
-                    </select>
+                    <form method="post" action="@Url.Action("AddRanobeToList", "Home")">
+                        <select name="selectedList" action="@Url.Action("AddRanobeToList", "Home")"
+                    asp-for="SelectedList[i]" onchange="this.form.submit()">
+                            <option value="0 @Model.List[i].Id">Нет</option>
+                            <option value="1 @Model.List[i].Id">Читаю</option>
+                            <option value="2 @Model.List[i].Id">В планах</option>
+                            <option value="3 @Model.List[i].Id">Брошено</option>
+                            <option value="4 @Model.List[i].Id">Прочитано</option>
+                            <option value="5 @Model.List[i].Id">Любимые</option>
+                        </select>
+                    </form>
 
                 </div>
 

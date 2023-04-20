@@ -24,7 +24,6 @@ namespace WebVersion.Pages.UserList
 
         public async void OnGetAsync()
         {
-            await GetAnime();
         }
 
         public async Task OnPostAnimeListSelect(string selectedList)

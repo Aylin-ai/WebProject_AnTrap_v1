@@ -12,14 +12,17 @@
 
                     <img src=@("https://shikimori.me")@Model.RanobeList[i].Image.Original alt="Отсутствует">
 
-                    <select>
-                        <option value="1">Нет</option>
-                        <option value="2">Читаю</option>
-                        <option value="3">В планах</option>
-                        <option value="4">Брошено</option>
-                        <option value="5">Прочитано</option>
-                        <option value="6">Любимые</option>
-                    </select>
+                    <form method="post" action="@Url.Action("AddRanobeToList", "Home")">
+                        <select name="selectedList" action="@Url.Action("AddRanobeToList", "Home")"
+                    asp-for="SelectedList[i]" onchange="this.form.submit()">
+                            <option value="0 @Model.RanobeList[i].Id">Нет</option>
+                            <option value="1 @Model.RanobeList[i].Id">Читаю</option>
+                            <option value="2 @Model.RanobeList[i].Id">В планах</option>
+                            <option value="3 @Model.RanobeList[i].Id">Брошено</option>
+                            <option value="4 @Model.RanobeList[i].Id">Прочитано</option>
+                            <option value="5 @Model.RanobeList[i].Id">Любимые</option>
+                        </select>
+                    </form>
 
                 </div>
 
@@ -86,11 +89,11 @@
             <div class="AnimeSelectionList">
 
                 <form method="post">
-                    <button name="selectedList" asp-page-handler="MangaListSelect" value="Читаю">Читаю</button>
-                    <button name="selectedList" asp-page-handler="MangaListSelect" value="В планах">В планах</button>
-                    <button name="selectedList" asp-page-handler="MangaListSelect" value="Брошено">Брошено</button>
-                    <button name="selectedList" asp-page-handler="MangaListSelect" value="Прочитано">Прочитано</button>
-                    <button name="selectedList" asp-page-handler="MangaListSelect" value="Любимые">Любимые</button>
+                    <button name="selectedList" asp-page-handler="RanobeListSelect" value="Читаю">Читаю</button>
+                    <button name="selectedList" asp-page-handler="RanobeListSelect" value="В планах">В планах</button>
+                    <button name="selectedList" asp-page-handler="RanobeListSelect" value="Брошено">Брошено</button>
+                    <button name="selectedList" asp-page-handler="RanobeListSelect" value="Прочитано">Прочитано</button>
+                    <button name="selectedList" asp-page-handler="RanobeListSelect" value="Любимые">Любимые</button>
                 </form>
 
             </div>

@@ -13,6 +13,8 @@ namespace WebVersion.Pages.UserList
 
         public List<int> CountOfAnimeInList { get; set; } = new List<int>();
 
+        public List<string> SelectedList { get; set; } = new List<string>();
+
         public RanobeListModel(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
@@ -20,7 +22,6 @@ namespace WebVersion.Pages.UserList
 
         public async void OnGetAsync()
         {
-            await GetRanobe();
         }
 
         public async Task OnPostRanobeListSelect(string selectedList)
@@ -86,6 +87,7 @@ namespace WebVersion.Pages.UserList
                     while (reader.Read())
                     {
                         RanobeList.Add(await httpClient.GetFromJsonAsync<RanobeId>($"/api/ranobe/{reader.GetInt32(0)}"));
+                        SelectedList.Add($"{listId} {reader.GetInt32(0)}");
                     }
                 }
             }

@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using MySql.Data.MySqlClient;
 using ShikimoriSharp.Classes;
+using WebVersion.AdditionalClasses;
 
 namespace WebVersion.Pages
 {
@@ -24,6 +26,9 @@ namespace WebVersion.Pages
         public int Genre { get; set; }
 
         public List<SelectListItem> Pages { get; set; } = new List<SelectListItem>();
+
+        public List<string> SelectedList { get; set; } = new List<string>();
+        public Dictionary<int, int> MangaInList { get; set; } = new Dictionary<int, int>();
 
         public MangaModel(IHttpClientFactory httpClientFactory)
         {
@@ -58,7 +63,10 @@ namespace WebVersion.Pages
         public async Task OnGetAsync()
         {
             if (User.Identity.IsAuthenticated)
+            {
+                await GetMangaFromUserList();
                 await GetMangas(1, Order);
+            }
             else
                 RedirectToPage("Index");
         }
@@ -88,6 +96,21 @@ namespace WebVersion.Pages
             }
             List = search.ToList();
             httpClient.Dispose();
+
+            foreach (var manga in List)
+            {
+                if (MangaInList.Keys.Any(x => x == manga.Id))
+                {
+                    SelectedList.Add(
+                        $"{MangaInList.Where(x => x.Key == manga.Id).First().Value} " +
+                        $"{MangaInList.Where(x => x.Key == manga.Id).First().Key}"
+                        );
+                }
+                else
+                {
+                    SelectedList.Add($"0 {manga.Id}");
+                }
+            }
         }
 
         public async Task OnPostById(int id, int order, string kind, string status, int genre)
@@ -116,6 +139,41 @@ namespace WebVersion.Pages
                 return RedirectToPage("/MangaId", new { mangaId = id });
             else
                 return RedirectToPage("Index");
+        }
+
+        public async Task GetMangaFromUserList()
+        {
+            MySqlConnection conn = DBUtils.GetDBConnection();
+            conn.Open();
+
+            try
+            {
+                MySqlCommand cmd = new MySqlCommand();
+                cmd.Connection = conn;
+
+                string sql = "select * from manga " +
+                    "where Manga_UserInformation_Login = @login";
+                cmd.CommandText = sql;
+                cmd.Parameters.AddWithValue("@login", User.Identity.Name);
+
+                var reader = await cmd.ExecuteReaderAsync();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        MangaInList[reader.GetInt32(1)] = reader.GetInt32(3);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
         }
     }
 }

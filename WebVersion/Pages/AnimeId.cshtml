@@ -18,14 +18,19 @@
             <div class="MainInformation">
                 <div class="ImageAndSelect">
                     <img src=@("https://shikimori.me")@Model.Anime.Image.Original alt="Отсутствует">
-                    <select>
-                        <option value="1">Нет</option>
-                        <option value="2">Смотрю</option>
-                        <option value="3">В планах</option>
-                        <option value="4">Брошено</option>
-                        <option value="5">Просмотрено</option>
-                        <option value="6">Любимые</option>
-                    </select>
+
+                    <form method="post" action="@Url.Action("AddAnimeToList", "Home")">
+                        <select name="selectedList" action="@Url.Action("AddAnimeToList", "Home")"
+                                asp-for="SelectedList" onchange="this.form.submit()">
+                            <option value="0 @Model.Anime.Id">Нет</option>
+                            <option value="1 @Model.Anime.Id">Смотрю</option>
+                            <option value="2 @Model.Anime.Id">В планах</option>
+                            <option value="3 @Model.Anime.Id">Брошено</option>
+                            <option value="4 @Model.Anime.Id">Просмотрено</option>
+                            <option value="5 @Model.Anime.Id">Любимые</option>
+                        </select>
+                    </form>
+
                 </div>
 
                 <div class="AnimeIdInformation">
@@ -103,21 +108,24 @@
                 <div class="OtherAnimes">
                     <label id="RelatedLabel">Связанное</label>
                     <div class="Related">
-                        @for (int i = 0; i < Model.Related.Length; i++)
+                        @for (int i = 0; i < Model.Related.Count(); i++)
                         {
                             if (Model.Related[i].Anime != null)
                             {
                                 <div class="RelatedAnime">
                                     <div class="ImageAndSelect">
                                         <img src=@("https://shikimori.me")@Model.Related[i].Anime.Image.Original alt="Отсутствует">
-                                        <select>
-                                            <option value="1">Нет</option>
-                                            <option value="2">Смотрю</option>
-                                            <option value="3">В планах</option>
-                                            <option value="4">Брошено</option>
-                                            <option value="5">Просмотрено</option>
-                                            <option value="6">Любимые</option>
-                                        </select>
+                                        <form method="post" action="@Url.Action("AddAnimeToList", "Home")">
+                                            <select name="selectedList" action="@Url.Action("AddAnimeToList", "Home")"
+                                            asp-for="SelectedLists[i]" onchange="this.form.submit()">
+                                                <option value="0 @Model.Related[i].Anime.Id">Нет</option>
+                                                <option value="1 @Model.Related[i].Anime.Id">Смотрю</option>
+                                                <option value="2 @Model.Related[i].Anime.Id">В планах</option>
+                                                <option value="3 @Model.Related[i].Anime.Id">Брошено</option>
+                                                <option value="4 @Model.Related[i].Anime.Id">Просмотрено</option>
+                                                <option value="5 @Model.Related[i].Anime.Id">Любимые</option>
+                                            </select>
+                                        </form>
                                     </div>
                                     <div>
                                         <div class="FiltrLabel">
@@ -139,15 +147,18 @@
                                 <div class="RelatedManga">
                                     <div class="ImageAndSelect">
                                         <img src=@("https://shikimori.me")@Model.Related[i].Manga.Image.Original alt="Отсутствует">
-                                        <select>
-                                            <option value="1">Нет</option>
-                                            <option value="2">Смотрю</option>
-                                            <option value="3">В планах</option>
-                                            <option value="4">Брошено</option>
-                                            <option value="5">Просмотрено</option>
-                                            <option value="6">Любимые</option>
-                                        </select>
-                                    </div>                                    
+                                        <form method="post" action="@Url.Action("AddMangaToList", "Home")">
+                                            <select name="selectedList" action="@Url.Action("AddMangaToList", "Home")"
+                                            asp-for="SelectedLists[i]" onchange="this.form.submit()">
+                                                <option value="0 @Model.Related[i].Manga.Id">Нет</option>
+                                                <option value="1 @Model.Related[i].Manga.Id">Читаю</option>
+                                                <option value="2 @Model.Related[i].Manga.Id">В планах</option>
+                                                <option value="3 @Model.Related[i].Manga.Id">Брошено</option>
+                                                <option value="4 @Model.Related[i].Manga.Id">Прочитано</option>
+                                                <option value="5 @Model.Related[i].Manga.Id">Любимые</option>
+                                            </select>
+                                        </form>
+                                    </div>
                                     <div>
                                         <div class="FiltrLabel">
                                             <label>@Model.Related[i].Manga.Russian</label>
@@ -163,7 +174,6 @@
                                     </div>
                                 </div>
                             }
-
                         }
                     </div>
                 
@@ -176,14 +186,17 @@
                                 <div class="SimilarAnime">
                                     <div class="ImageAndSelect">
                                         <img src=@("https://shikimori.me")@Model.Similar[i].Image.Original alt="Отсутствует">
-                                        <select>
-                                            <option value="1">Нет</option>
-                                            <option value="2">Читаю</option>
-                                            <option value="3">В планах</option>
-                                            <option value="4">Брошено</option>
-                                            <option value="5">Просмотрено</option>
-                                            <option value="6">Любимые</option>
-                                        </select>
+                                        <form method="post" action="@Url.Action("AddAnimeToList", "Home")">
+                                            <select name="selectedList" action="@Url.Action("AddAnimeToList", "Home")"
+                                            asp-for="SimilarAnimeList[i]" onchange="this.form.submit()">
+                                                <option value="0 @Model.Similar[i].Id">Нет</option>
+                                                <option value="1 @Model.Similar[i].Id">Смотрю</option>
+                                                <option value="2 @Model.Similar[i].Id">В планах</option>
+                                                <option value="3 @Model.Similar[i].Id">Брошено</option>
+                                                <option value="4 @Model.Similar[i].Id">Просмотрено</option>
+                                                <option value="5 @Model.Similar[i].Id">Любимые</option>
+                                            </select>
+                                        </form>
                                     </div>
                                     <div class="SimilarAnimeInformation">
                                         <label>@Model.Similar[i].Russian</label>

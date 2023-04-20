@@ -13,6 +13,8 @@ namespace WebVersion.Pages.UserList
 
         public List<int> CountOfAnimeInList { get; set; } = new List<int>();
 
+        public List<string> SelectedList { get; set; } = new List<string>();
+
         public MangaListModel(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
@@ -20,7 +22,6 @@ namespace WebVersion.Pages.UserList
 
         public async void OnGetAsync()
         {
-            await GetManga();
         }
 
         public async Task OnPostMangaListSelect(string selectedList)
@@ -86,6 +87,7 @@ namespace WebVersion.Pages.UserList
                     while (reader.Read())
                     {
                         MangaList.Add(await httpClient.GetFromJsonAsync<MangaID>($"/api/mangas/{reader.GetInt32(0)}"));
+                        SelectedList.Add($"{listId} {reader.GetInt32(0)}");
                     }
                 }
             }

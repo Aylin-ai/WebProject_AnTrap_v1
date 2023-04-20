@@ -94,7 +94,7 @@ namespace WebVersion.Controllers
                     }
                     else
                     {
-                        if (AnimeInList.Keys.Where(x => x == selectedList.Split(' ')[1]).Count() == 0)
+                        if (!AnimeInList.Keys.Any(x => x == selectedList.Split(' ')[1]))
                         {
                             sql = "insert into anime (Anime_AnimeId, Anime_UserInformation_Login, " +
                                 "Anime_ListInformation_Id) values " +
@@ -133,7 +133,7 @@ namespace WebVersion.Controllers
                 return RedirectToPage("/Index");
         }
 
-        public async Task AddMangaToList(string selectedList)
+        public async Task<IActionResult> AddMangaToList(string selectedList)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -156,7 +156,7 @@ namespace WebVersion.Controllers
                     }
                     else
                     {
-                        if (MangaInList.Keys.Where(x => x == selectedList.Split(' ')[1]).Count() == 0)
+                        if (!MangaInList.Keys.Any(x => x == selectedList.Split(' ')[1]))
                         {
                             sql = "insert into manga (Manga_MangaId, Manga_UserInformation_Login, " +
                                 "Manga_ListInformation_Id) values " +
@@ -178,10 +178,12 @@ namespace WebVersion.Controllers
 
                     await cmd.ExecuteNonQueryAsync();
                     MangaInList.Clear();
+                    return Redirect(Request.Headers["Referer"].ToString());
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
+                    return RedirectToPage("/Error");
                 }
                 finally
                 {
@@ -190,10 +192,10 @@ namespace WebVersion.Controllers
                 }
             }
             else
-                RedirectToPage("/Index");
+                return RedirectToPage("/Index");
         }
 
-        public async Task AddRanobeToList(string selectedList)
+        public async Task<IActionResult> AddRanobeToList(string selectedList)
         {
             if (User.Identity.IsAuthenticated)
             {
@@ -216,7 +218,7 @@ namespace WebVersion.Controllers
                     }
                     else
                     {
-                        if (RanobeInList.Keys.Where(x => x == selectedList.Split(' ')[1]).Count() == 0)
+                        if (!RanobeInList.Keys.Any(x => x == selectedList.Split(' ')[1]))
                         {
                             sql = "insert into ranobe (Ranobe_RanobeId, Ranobe_UserInformation_Login, " +
                                 "Ranobe_ListInformation_Id) values " +
@@ -238,10 +240,11 @@ namespace WebVersion.Controllers
 
                     await cmd.ExecuteNonQueryAsync();
                     RanobeInList.Clear();
+                    return Redirect(Request.Headers["Referer"].ToString());
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    return RedirectToPage("/Error");
                 }
                 finally
                 {
@@ -250,7 +253,7 @@ namespace WebVersion.Controllers
                 }
             }
             else
-                RedirectToPage("/Index");
+                return RedirectToPage("/Index");
         }
 
 
@@ -305,7 +308,7 @@ namespace WebVersion.Controllers
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.Connection = conn;
 
-                string sql = "select * from manga" +
+                string sql = "select * from manga " +
                     "where Manga_UserInformation_Login = @login";
                 cmd.CommandText = sql;
                 cmd.Parameters.AddWithValue("@login", User.Identity.Name);

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using MySql.Data.MySqlClient;
 using ShikimoriSharp.Classes;
 using WebVersion.AdditionalClasses;
 
@@ -22,6 +23,9 @@ namespace WebVersion.Pages
         public int Genre { get; set; }
 
         public List<SelectListItem> Pages { get; set; } = new List<SelectListItem>();
+
+        public List<string> SelectedList { get; set; } = new List<string>();
+        public Dictionary<int, int> RanobeInList { get; set; } = new Dictionary<int, int>();
 
         public RanobeModel(IHttpClientFactory httpClientFactory)
         {
@@ -47,7 +51,10 @@ namespace WebVersion.Pages
         public async Task OnGetAsync()
         {
             if (User.Identity.IsAuthenticated)
+            {
+                await GetRanobeFromUserList();
                 await GetRanobe(1, Order);
+            }
             else
                 RedirectToPage("Index");
         }
@@ -77,6 +84,21 @@ namespace WebVersion.Pages
             }
             List = search.ToList();
             httpClient.Dispose();
+
+            foreach (var ranobe in List)
+            {
+                if (RanobeInList.Keys.Any(x => x == ranobe.Id))
+                {
+                    SelectedList.Add(
+                        $"{RanobeInList.Where(x => x.Key == ranobe.Id).First().Value} " +
+                        $"{RanobeInList.Where(x => x.Key == ranobe.Id).First().Key}"
+                        );
+                }
+                else
+                {
+                    SelectedList.Add($"0 {ranobe.Id}");
+                }
+            }
         }
 
         public async Task OnPostById(int id, int order, string status, int genre)
@@ -104,6 +126,41 @@ namespace WebVersion.Pages
                 return RedirectToPage("/RanobeId", new { ranobeId = id });
             else
                 return RedirectToPage("Index");
+        }
+
+        public async Task GetRanobeFromUserList()
+        {
+            MySqlConnection conn = DBUtils.GetDBConnection();
+            conn.Open();
+
+            try
+            {
+                MySqlCommand cmd = new MySqlCommand();
+                cmd.Connection = conn;
+
+                string sql = "select * from ranobe " +
+                    "where Ranobe_UserInformation_Login = @login";
+                cmd.CommandText = sql;
+                cmd.Parameters.AddWithValue("@login", User.Identity.Name);
+
+                var reader = await cmd.ExecuteReaderAsync();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        RanobeInList[reader.GetInt32(1)] = reader.GetInt32(3);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
         }
     }
 }
