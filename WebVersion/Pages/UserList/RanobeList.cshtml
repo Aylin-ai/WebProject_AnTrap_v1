@@ -1,0 +1,104 @@
+﻿@page
+@model WebVersion.Pages.UserList.RanobeListModel
+@{
+
+    async Task GetRanobe()
+    {
+        for (int i = 0; i < Model.RanobeList.Count; i++)
+        {
+            <div class="AnimeContainer">
+
+                <div class="PictureAndListContainer">
+
+                    <img src=@("https://shikimori.me")@Model.RanobeList[i].Image.Original alt="Отсутствует">
+
+                    <select>
+                        <option value="1">Нет</option>
+                        <option value="2">Читаю</option>
+                        <option value="3">В планах</option>
+                        <option value="4">Брошено</option>
+                        <option value="5">Прочитано</option>
+                        <option value="6">Любимые</option>
+                    </select>
+
+                </div>
+
+                <form method="post">
+                    <div class="AnimeInformation">
+                        <label id="AnimeName">@Model.RanobeList[i].Russian</label>
+                        <label id="AnimeEnglishName">@Model.RanobeList[i].Name</label>
+                        <label class="OtherInformation">@Model.RanobeList[i].Kind @("/") @Model.RanobeList[i].Status</label>
+                        <label class="OtherInformation">@("Оценка:") @Model.RanobeList[i].Score</label>
+                        <label class="OtherInformation">
+                            @foreach (var genre in Model.RanobeList[i].Genres)
+                            {
+                                @($"{genre.Russian} ")
+                            }
+                        </label>
+                    </div>
+                    <input type="submit" value="Подробнее" asp-page-handler="RanobeIdPage" asp-route-id="@Model.RanobeList[i].Id" />
+                </form>
+
+            </div>
+
+            <hr>
+        }
+    }
+
+}
+
+<html>
+
+<head>
+
+    <link rel="stylesheet" type="text/css" href="~/css/UserListStyle.css" asp-append-version="true" />
+
+</head>
+
+<body>
+
+    <div class="MainContainer">
+
+        <div class="UserContainer">
+
+            <img scr="" />
+
+            <label>@User.Identity.Name</label>
+
+            <div class="SettingButtonContainer">
+                <form method="post">
+                    <button asp-page-handler="ToSettings">Настройки</button>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="Container">
+
+            <div id="AnimeList" class="AnimeListContainer">
+
+                @{
+                    await GetRanobe();
+                }
+
+            </div>
+
+            <div class="AnimeSelectionList">
+
+                <form method="post">
+                    <button name="selectedList" asp-page-handler="MangaListSelect" value="Читаю">Читаю</button>
+                    <button name="selectedList" asp-page-handler="MangaListSelect" value="В планах">В планах</button>
+                    <button name="selectedList" asp-page-handler="MangaListSelect" value="Брошено">Брошено</button>
+                    <button name="selectedList" asp-page-handler="MangaListSelect" value="Прочитано">Прочитано</button>
+                    <button name="selectedList" asp-page-handler="MangaListSelect" value="Любимые">Любимые</button>
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

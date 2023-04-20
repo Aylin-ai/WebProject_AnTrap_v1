@@ -12,14 +12,17 @@
 
                     <img src=@("https://shikimori.me")@Model.AnimeList[i].Image.Original alt="Отсутствует">
 
-                    <select>
-                        <option value="1">Нет</option>
-                        <option value="2">Смотрю</option>
-                        <option value="3">В планах</option>
-                        <option value="4">Брошено</option>
-                        <option value="5">Просмотрено</option>
-                        <option value="6">Любимые</option>
-                    </select>
+                    <form method="post" action="@Url.Action("AddAnimeToList", "Home")">
+                        <select name="selectedList" action="@Url.Action("AddAnimeToList", "Home")"
+                    asp-for="SelectedList[i]" onchange="this.form.submit()">
+                            <option value="0 @Model.AnimeList[i].Id">Нет</option>
+                            <option value="1 @Model.AnimeList[i].Id">Смотрю</option>
+                            <option value="2 @Model.AnimeList[i].Id">В планах</option>
+                            <option value="3 @Model.AnimeList[i].Id">Брошено</option>
+                            <option value="4 @Model.AnimeList[i].Id">Просмотрено</option>
+                            <option value="5 @Model.AnimeList[i].Id">Любимые</option>
+                        </select>
+                    </form>
 
                 </div>
 

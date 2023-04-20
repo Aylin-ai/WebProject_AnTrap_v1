@@ -1,0 +1,161 @@
+﻿body {
+
+}
+
+.MainContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+}
+
+.UserContainer {
+    display: flex;
+    flex-direction: row;
+    background-color: #1D252A;
+    width: 80vw;
+}
+
+    .UserContainer img {
+        width: 80px;
+        height: 80px;
+        margin: 10px;
+    }
+
+    .UserContainer label {
+        font-size: 24px;
+        color: white;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        align-self: center;
+    }
+
+.UserContainer .SettingButtonContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: end;
+    width: 100%;
+}
+
+.UserContainer .SettingButtonContainer button {
+    font-size: 24px;
+    background-color: #1D252A;
+    border-color: white;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 10px;
+}
+
+.Container {
+    display: flex;
+    flex-direction: row;
+    background-color: transparent;
+    align-items: center;
+    justify-content: center;
+}
+
+.Container .AnimeListContainer {
+    display: flex;
+    flex-direction: column;
+    background-color: #1D252A;
+    border-radius: 10px;
+    margin: 15px;
+    width: 65vw;
+}
+
+.Container .AnimeSelectionList {
+    position: sticky;
+    top: 120px;
+    display: flex;
+    flex-direction: column;
+    background-color: #1D252A;
+    border-radius: 10px;
+    align-self: first baseline;
+    margin: 15px;
+}
+
+.Container .AnimeSelectionList form {
+    display: flex;
+    flex-direction: column;
+}
+
+
+.Container .AnimeSelectionList button {
+    font-size: 24px;
+    background-color: transparent;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 10px;
+    border: none;
+    border-bottom: 1px solid white;
+}
+
+.Container .AnimeSelectionList button:hover {
+    color: gray;
+}
+
+.AnimeContainer {
+    display: flex;
+    flex-direction: row;
+    margin: 0px 30px;
+    background-color: transparent;
+    border: none;
+}
+
+.AnimeContainer hr {
+    border: 3px solid black;
+}
+
+.PictureAndListContainer {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.PictureAndListContainer select {
+    font-size: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: 125px;
+    border: none;
+}
+
+.PictureAndListContainer img {
+    font-size: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    width: 125px;
+    height: 175px;
+    margin: 10px;
+    margin-left: 0px;
+}
+
+.AnimeInformation {
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+}
+
+.AnimeInformation #AnimeName {
+    font-size: 30px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    margin: 5px;
+    max-width: 700px;
+}
+
+.AnimeInformation #AnimeEnglishName {
+    font-size: 14px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    margin: 5px;
+}
+
+.AnimeInformation .OtherInformation {
+    font-size: 16px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    margin: 5px;
+}
+

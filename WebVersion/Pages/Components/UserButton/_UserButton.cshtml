@@ -50,7 +50,9 @@
         <img id="menu-toggle" scr=@Model aria-expanded="false" />
 
         <div id="menu" aria-hidden="true">
-            <button name="selectedValue" action="@Url.Action("SelectionFromUser", "Home")" value="userList">Список</button>
+            <button name="selectedValue" action="@Url.Action("SelectionFromUser", "Home")" value="animeList">Аниме пользователя</button>
+            <button name="selectedValue" action="@Url.Action("SelectionFromUser", "Home")" value="mangaList">Манга пользователя</button>
+            <button name="selectedValue" action="@Url.Action("SelectionFromUser", "Home")" value="ranobeList">Ранобэ пользователя</button>
             <button name="selectedValue" action="@Url.Action("SelectionFromUser", "Home")" value="settings">Настройки</button>
             <button name="selectedValue" action="@Url.Action("SelectionFromUser", "Home")" value="logout">Выйти</button>
         </div>

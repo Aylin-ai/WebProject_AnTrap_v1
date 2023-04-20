@@ -1,0 +1,104 @@
+﻿@page
+@model WebVersion.Pages.UserList.MangaListModel
+@{
+
+    async Task GetMangas()
+    {
+        for (int i = 0; i < Model.MangaList.Count; i++)
+        {
+            <div class="AnimeContainer">
+
+                <div class="PictureAndListContainer">
+
+                    <img src=@("https://shikimori.me")@Model.MangaList[i].Image.Original alt="Отсутствует">
+
+                    <select>
+                        <option value="1">Нет</option>
+                        <option value="2">Смотрю</option>
+                        <option value="3">В планах</option>
+                        <option value="4">Брошено</option>
+                        <option value="5">Просмотрено</option>
+                        <option value="6">Любимые</option>
+                    </select>
+
+                </div>
+
+                <form method="post">
+                    <div class="AnimeInformation">
+                        <label id="AnimeName">@Model.MangaList[i].Russian</label>
+                        <label id="AnimeEnglishName">@Model.MangaList[i].Name</label>
+                        <label class="OtherInformation">@Model.MangaList[i].Kind @("/") @Model.MangaList[i].Status</label>
+                        <label class="OtherInformation">@("Оценка:") @Model.MangaList[i].Score</label>
+                        <label class="OtherInformation">
+                            @foreach (var genre in Model.MangaList[i].Genres)
+                            {
+                                @($"{genre.Russian} ")
+                            }
+                        </label>
+                    </div>
+                    <input type="submit" value="Подробнее" asp-page-handler="MangaIdPage" asp-route-id="@Model.MangaList[i].Id" />
+                </form>
+
+            </div>
+
+            <hr>
+        }
+    }
+
+}
+
+<html>
+
+<head>
+
+    <link rel="stylesheet" type="text/css" href="~/css/UserListStyle.css" asp-append-version="true" />
+
+</head>
+
+<body>
+
+    <div class="MainContainer">
+
+        <div class="UserContainer">
+
+            <img scr="" />
+
+            <label>@User.Identity.Name</label>
+
+            <div class="SettingButtonContainer">
+                <form method="post">
+                    <button asp-page-handler="ToSettings">Настройки</button>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="Container">
+
+            <div id="AnimeList" class="AnimeListContainer">
+
+                @{
+                    await GetMangas();
+                }
+
+            </div>
+
+            <div class="AnimeSelectionList">
+
+                <form method="post">
+                    <button name="selectedList" asp-page-handler="MangaListSelect" value="Читаю">Читаю</button>
+                    <button name="selectedList" asp-page-handler="MangaListSelect" value="В планах">В планах</button>
+                    <button name="selectedList" asp-page-handler="MangaListSelect" value="Брошено">Брошено</button>
+                    <button name="selectedList" asp-page-handler="MangaListSelect" value="Прочитано">Прочитано</button>
+                    <button name="selectedList" asp-page-handler="MangaListSelect" value="Любимые">Любимые</button>
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

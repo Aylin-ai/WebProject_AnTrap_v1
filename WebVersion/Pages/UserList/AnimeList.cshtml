@@ -1,0 +1,106 @@
+﻿@page
+@model WebVersion.Pages.UserList.AnimeListModel
+@{
+
+    async Task GetAnimes()
+    {
+        for (int i = 0; i < Model.AnimeList.Count; i++)
+        {
+            <div class="AnimeContainer">
+
+                <div class="PictureAndListContainer">
+
+                    <img src=@("https://shikimori.me")@Model.AnimeList[i].Image.Original alt="Отсутствует">
+
+                    <form method="post" action="@Url.Action("AddAnimeToList", "Home")">
+                        <select name="selectedList" action="@Url.Action("AddAnimeToList", "Home")"
+                    asp-for="SelectedList[i]" onchange="this.form.submit()">
+                            <option value="0 @Model.AnimeList[i].Id">Нет</option>
+                            <option value="1 @Model.AnimeList[i].Id">Смотрю</option>
+                            <option value="2 @Model.AnimeList[i].Id">В планах</option>
+                            <option value="3 @Model.AnimeList[i].Id">Брошено</option>
+                            <option value="4 @Model.AnimeList[i].Id">Просмотрено</option>
+                            <option value="5 @Model.AnimeList[i].Id">Любимые</option>
+                        </select>
+                    </form>
+
+                </div>
+
+                <form method="post">
+                    <div class="AnimeInformation">
+                        <label id="AnimeName">@Model.AnimeList[i].Russian</label>
+                        <label id="AnimeEnglishName">@Model.AnimeList[i].Name</label>
+                        <label class="OtherInformation">@Model.AnimeList[i].Kind @("/") @Model.AnimeList[i].Status</label>
+                        <label class="OtherInformation">@("Оценка:") @Model.AnimeList[i].Score</label>
+                        <label class="OtherInformation">@foreach (var genre in Model.AnimeList[i].Genres)
+                            {
+                                @($"{genre.Russian} ")
+                            }
+                        </label>
+                    </div>
+                    <input type="submit" value="Подробнее" asp-page-handler="AnimeIdPage" asp-route-id="@Model.AnimeList[i].Id" />
+                </form>
+
+            </div>
+
+            <hr>
+        }
+    }
+
+}
+
+<html>
+
+<head>
+
+    <link rel="stylesheet" type="text/css" href="~/css/UserListStyle.css" asp-append-version="true" />
+
+</head>
+
+<body>
+
+    <div class="MainContainer">
+
+        <div class="UserContainer">
+
+            <img scr="" />
+
+            <label>@User.Identity.Name</label>
+
+            <div class="SettingButtonContainer">
+                <form method="post">
+                    <button asp-page-handler="ToSettings">Настройки</button>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="Container">
+
+            <div class="AnimeListContainer">
+
+                @{
+                    await GetAnimes();
+                }
+
+            </div>
+
+            <div class="AnimeSelectionList">
+
+                <form method="post">
+                    <button name="selectedList" asp-page-handler="AnimeListSelect" value="Смотрю">Смотрю</button>
+                    <button name="selectedList" asp-page-handler="AnimeListSelect" value="В планах">В планах</button>
+                    <button name="selectedList" asp-page-handler="AnimeListSelect" value="Брошено">Брошено</button>
+                    <button name="selectedList" asp-page-handler="AnimeListSelect" value="Просмотрено">Просмотрено</button>
+                    <button name="selectedList" asp-page-handler="AnimeListSelect" value="Любимые">Любимые</button>
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>

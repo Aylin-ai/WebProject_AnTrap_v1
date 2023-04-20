@@ -7,6 +7,8 @@ using System.Net.Http;
 using WebVersion.Models;
 using ShikimoriSharp.Classes;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using MySql.Data.MySqlClient;
+using WebVersion.AdditionalClasses;
 
 namespace WebVersion.Pages
 {
@@ -29,6 +31,9 @@ namespace WebVersion.Pages
         public int Genre { get; set; }
 
         public List<SelectListItem> PagesId { get; set; } = new List<SelectListItem>();
+
+        public List<string> SelectedList { get; set; } = new List<string>();
+        public Dictionary<int, int> AnimeInList { get; set; } = new Dictionary<int, int>();
 
         public MainAnimePageModel(IHttpClientFactory httpClientFactory)
         {
@@ -62,6 +67,7 @@ namespace WebVersion.Pages
 
         public async Task OnGetAsync()
         {
+            await GetAnimesFromUserList();
             await GetAnimes(1, Order);
         }
 
@@ -90,6 +96,21 @@ namespace WebVersion.Pages
             }
             AnimeList = search.ToList();
             httpClient.Dispose();
+
+            foreach(var anime in AnimeList)
+            {
+                if (AnimeInList.Keys.Any(x => x == anime.Id))
+                {
+                    SelectedList.Add(
+                        $"{AnimeInList.Where(x => x.Key == anime.Id).First().Value} " +
+                        $"{AnimeInList.Where(x => x.Key == anime.Id).First().Key}"
+                        );
+                }
+                else
+                {
+                    SelectedList.Add($"0 {anime.Id}");
+                }
+            }
         }
 
         public async Task OnPostAnimesById(int id, int order, string type, string status, int genre)
@@ -115,6 +136,41 @@ namespace WebVersion.Pages
         public IActionResult OnPostAnimeIdPage(int id)
         {
             return RedirectToPage("/AnimeId", new { animeId = id });
+        }
+
+        public async Task GetAnimesFromUserList()
+        {
+            MySqlConnection conn = DBUtils.GetDBConnection();
+            conn.Open();
+
+            try
+            {
+                MySqlCommand cmd = new MySqlCommand();
+                cmd.Connection = conn;
+
+                string sql = "select * from anime " +
+                    "where Anime_UserInformation_Login = @login";
+                cmd.CommandText = sql;
+                cmd.Parameters.AddWithValue("@login", User.Identity.Name);
+
+                var reader = await cmd.ExecuteReaderAsync();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        AnimeInList[reader.GetInt32(1)] = reader.GetInt32(3);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                conn.Close();
+                conn.Dispose();
+            }
         }
     }
 }
