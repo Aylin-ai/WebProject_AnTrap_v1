@@ -30,6 +30,8 @@ namespace WebVersion.Pages
         public List<string> SelectedList { get; set; } = new List<string>();
         public Dictionary<int, int> MangaInList { get; set; } = new Dictionary<int, int>();
 
+        public string Search { get; set; }
+
         public MangaModel(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
@@ -113,8 +115,50 @@ namespace WebVersion.Pages
             }
         }
 
-        public async Task OnPostById(int id, int order, string kind, string status, int genre)
+        public async Task GetMangas(string searchManga)
         {
+            HttpClient httpClient = _httpClientFactory.CreateClient();
+            httpClient.BaseAddress = new Uri("https://shikimori.me");
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("User-Agent", "ShikiOAuthTest");
+
+
+            Manga[] search = new Manga[1];
+            var genres = await httpClient.GetFromJsonAsync<Genre[]>("/api/genres");
+            Genres.Add(new SelectListItem { Value = "0", Text = "Âñ¸" });
+            for (int i = 0; i < genres.Length; i++)
+            {
+                Genres.Add(new SelectListItem { Value = genres[i].Id.ToString(), Text = genres[i].Russian.ToString() });
+            }
+            if (searchManga != null)
+            {
+                search = await httpClient.GetFromJsonAsync<Manga[]>($"/api/mangas?search={searchManga}");
+            }
+            List = search.ToList();
+            httpClient.Dispose();
+
+            foreach (var manga in List)
+            {
+                if (MangaInList.Keys.Any(x => x == manga.Id))
+                {
+                    SelectedList.Add(
+                        $"{MangaInList.Where(x => x.Key == manga.Id).First().Value} " +
+                        $"{MangaInList.Where(x => x.Key == manga.Id).First().Key}"
+                        );
+                }
+                else
+                {
+                    SelectedList.Add($"0 {manga.Id}");
+                }
+            }
+        }
+
+        public async Task OnPostById(int id, int order, string kind, string status, int genre, string search)
+        {
+            if (search != null)
+            {
+                Search = search;
+                await GetMangas(Search);
+            }
             Id = id;
             switch (order)
             {

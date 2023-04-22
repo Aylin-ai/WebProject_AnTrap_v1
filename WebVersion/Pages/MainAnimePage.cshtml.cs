@@ -35,6 +35,8 @@ namespace WebVersion.Pages
         public List<string> SelectedList { get; set; } = new List<string>();
         public Dictionary<int, int> AnimeInList { get; set; } = new Dictionary<int, int>();
 
+        public string Search { get; set; }
+
         public MainAnimePageModel(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
@@ -113,24 +115,69 @@ namespace WebVersion.Pages
             }
         }
 
-        public async Task OnPostAnimesById(int id, int order, string type, string status, int genre)
+        public async Task GetAnimes(string searchAnime)
         {
-            Id = id;
-            switch (order)
+            HttpClient httpClient = _httpClientFactory.CreateClient();
+            httpClient.BaseAddress = new Uri("https://shikimori.me");
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("User-Agent", "ShikiOAuthTest");
+
+            var genres = await httpClient.GetFromJsonAsync<Genre[]>("/api/genres");
+            AnimeGenres.Add(new SelectListItem { Value = "0", Text = "Âñ¸" });
+            for (int i = 0; i < genres.Length; i++)
             {
-                case 1: Order = ShikimoriSharp.Enums.Order.ranked; break;
-                case 2: Order = ShikimoriSharp.Enums.Order.kind; break;
-                case 3: Order = ShikimoriSharp.Enums.Order.popularity; break;
-                case 4: Order = ShikimoriSharp.Enums.Order.name; break;
-                case 5: Order = ShikimoriSharp.Enums.Order.aired_on; break;
-                case 6: Order = ShikimoriSharp.Enums.Order.status; break;
-                case 7: Order = ShikimoriSharp.Enums.Order.random; break;
-                default: Order = ShikimoriSharp.Enums.Order.ranked; break;
+                AnimeGenres.Add(new SelectListItem { Value = genres[i].Id.ToString(), Text = genres[i].Russian.ToString() });
             }
-            Type = type;
-            Status = status;
-            Genre = genre;
-            await GetAnimes(Id, Order, Type, Status, Genre);
+
+            Anime[] search = new Anime[1];
+            if (searchAnime != null)
+            {
+                search = await httpClient.GetFromJsonAsync<Anime[]>($"/api/animes?search={searchAnime}");
+            }
+            AnimeList = search.ToList();
+            httpClient.Dispose();
+
+            foreach (var anime in AnimeList)
+            {
+                if (AnimeInList.Keys.Any(x => x == anime.Id))
+                {
+                    SelectedList.Add(
+                        $"{AnimeInList.Where(x => x.Key == anime.Id).First().Value} " +
+                        $"{AnimeInList.Where(x => x.Key == anime.Id).First().Key}"
+                        );
+                }
+                else
+                {
+                    SelectedList.Add($"0 {anime.Id}");
+                }
+            }
+        }
+
+        public async Task OnPostAnimesById(int id, int order, string type, string status, int genre, string search)
+        {
+            if (search != null)
+            {
+                Search = search;
+                await GetAnimes(Search);
+            }
+            else
+            {
+                Id = id;
+                switch (order)
+                {
+                    case 1: Order = ShikimoriSharp.Enums.Order.ranked; break;
+                    case 2: Order = ShikimoriSharp.Enums.Order.kind; break;
+                    case 3: Order = ShikimoriSharp.Enums.Order.popularity; break;
+                    case 4: Order = ShikimoriSharp.Enums.Order.name; break;
+                    case 5: Order = ShikimoriSharp.Enums.Order.aired_on; break;
+                    case 6: Order = ShikimoriSharp.Enums.Order.status; break;
+                    case 7: Order = ShikimoriSharp.Enums.Order.random; break;
+                    default: Order = ShikimoriSharp.Enums.Order.ranked; break;
+                }
+                Type = type;
+                Status = status;
+                Genre = genre;
+                await GetAnimes(Id, Order, Type, Status, Genre);
+            }
         }
 
         public IActionResult OnPostAnimeIdPage(int id)

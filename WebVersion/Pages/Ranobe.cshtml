@@ -75,11 +75,6 @@
                 </div>
 
                 <div class="LabelAndInput">
-                    <label class="FiltrLabel">Выбор страницы</label>
-                    <select id="PagesSelect" asp-for="Page" asp-items="@Model.Pages" onchange="this.form.submit()"></select>
-                </div>
-
-                <div class="LabelAndInput">
 
                     <label class="FiltrLabel">Сортировка</label>
 
@@ -95,9 +90,19 @@
 
                 </div>
 
+                <div class="LabelAndInput">
+                    <label class="FiltrLabel">Выбор страницы</label>
+                    <select id="PagesSelect" asp-for="Page" asp-items="@Model.Pages" onchange="this.form.submit()"></select>
+                </div>
+
+                <div class="LabelAndInput">
+
+                    <label class="FiltrLabel">Поиск</label>
+                    <input type="text" asp-for="Search" onchange="this.form.submit()" />
+
+                </div>
+
             </form>
-
-
 
         </div>
 

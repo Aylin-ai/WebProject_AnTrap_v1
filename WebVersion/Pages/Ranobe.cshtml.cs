@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MySql.Data.MySqlClient;
+using ShikimoriSharp.Bases;
 using ShikimoriSharp.Classes;
 using WebVersion.AdditionalClasses;
 
@@ -26,6 +27,8 @@ namespace WebVersion.Pages
 
         public List<string> SelectedList { get; set; } = new List<string>();
         public Dictionary<int, int> RanobeInList { get; set; } = new Dictionary<int, int>();
+
+        public string Search { get; set; }
 
         public RanobeModel(IHttpClientFactory httpClientFactory)
         {
@@ -65,7 +68,6 @@ namespace WebVersion.Pages
             httpClient.BaseAddress = new Uri("https://shikimori.me");
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("User-Agent", "ShikiOAuthTest");
 
-
             Ranobe[] search;
             var genres = await httpClient.GetFromJsonAsync<Genre[]>("/api/genres");
             Genres.Add(new SelectListItem { Value = "0", Text = "Âñ¸" });
@@ -101,8 +103,49 @@ namespace WebVersion.Pages
             }
         }
 
-        public async Task OnPostById(int id, int order, string status, int genre)
+        public async Task GetRanobe(string searchRanobe)
         {
+            HttpClient httpClient = _httpClientFactory.CreateClient();
+            httpClient.BaseAddress = new Uri("https://shikimori.me");
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("User-Agent", "ShikiOAuthTest");
+
+            Ranobe[] search = new Ranobe[1];
+            var genres = await httpClient.GetFromJsonAsync<Genre[]>("/api/genres");
+            Genres.Add(new SelectListItem { Value = "0", Text = "Âñ¸" });
+            for (int i = 0; i < genres.Length; i++)
+            {
+                Genres.Add(new SelectListItem { Value = genres[i].Id.ToString(), Text = genres[i].Russian.ToString() });
+            }
+            if (searchRanobe != null)
+            {
+                search = await httpClient.GetFromJsonAsync<Ranobe[]>($"/api/ranobe?search={searchRanobe}");
+            }
+            List = search.ToList();
+            httpClient.Dispose();
+
+            foreach (var ranobe in List)
+            {
+                if (RanobeInList.Keys.Any(x => x == ranobe.Id))
+                {
+                    SelectedList.Add(
+                        $"{RanobeInList.Where(x => x.Key == ranobe.Id).First().Value} " +
+                        $"{RanobeInList.Where(x => x.Key == ranobe.Id).First().Key}"
+                        );
+                }
+                else
+                {
+                    SelectedList.Add($"0 {ranobe.Id}");
+                }
+            }
+        }
+
+        public async Task OnPostById(int id, int order, string status, int genre, string search)
+        {
+            if (search != null)
+            {
+                Search = search;
+                await GetRanobe(Search);
+            }
             Id = id;
             switch (order)
             {

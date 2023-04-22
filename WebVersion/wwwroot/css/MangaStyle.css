@@ -14,7 +14,7 @@
     flex-direction: column;
     background-color: #1D252A;
     border-radius: 10px;
-    min-width: 500px;
+    width: 55vw;
 }
 
 .MangaContainer {

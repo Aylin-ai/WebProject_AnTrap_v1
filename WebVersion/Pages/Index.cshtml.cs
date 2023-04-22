@@ -151,12 +151,12 @@ namespace WebVersion.Pages
                     {
                         while (reader.Read())
                         {
-                            if (Login != reader.GetString(0) && Password1 != reader.GetString(1))
+                            if (Login != reader.GetString(1) && Password1 != reader.GetString(2))
                             {
                                 ErrorMessage = "Неправильный логин или пароль";
                                 return Page();
                             }
-                            UserImageSrc = reader.GetString(3);
+                            UserImageSrc = reader.GetString(4);
                         }
                     }
 
