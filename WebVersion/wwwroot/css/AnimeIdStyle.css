@@ -64,26 +64,26 @@
     margin: 5px;
 }
 
-.OtherAnimes {
+.Other {
     display: flex;
     flex-direction: column;
 }
 
-.OtherAnimes label {
-    font-size: 16px;
-    max-width: 200px;
-}
-    .OtherAnimes form {
+    .Other label {
+        font-size: 16px;
+        max-width: 200px;
+    }
+    .Other form {
         max-width: 150px;
         margin: 5px;
     }
-    .OtherAnimes form select {
+        .Other form select {
+            width: 150px;
+        }
+    .Other img {
         width: 150px;
+        height: 200px;
     }
-.OtherAnimes img {
-    width: 150px;
-    height: 200px;
-}
 
 .Related {
     display: flex;
@@ -114,15 +114,15 @@
     margin: 5px;
 }
 
-.Similar .SimilarAnime {
+.Similar .SimilarPiece {
     display: flex;
     height: 300px;
     width: 350px
 }
-.Similar .SimilarAnime .SimilarAnimeInformation {
-    display: flex;
-    flex-direction: column;
-}
+    .Similar .SimilarPiece .SimilarInformation {
+        display: flex;
+        flex-direction: column;
+    }
 
 .LabelAndInput {
     display: flex;

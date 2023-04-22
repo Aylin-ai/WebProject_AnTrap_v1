@@ -48,7 +48,12 @@
         max-width: 200px;
     }
 
-    .Other select {
+.OtherAnimes form {
+    max-width: 150px;
+    margin: 5px;
+}
+
+    .OtherAnimes form select {
         width: 150px;
     }
 

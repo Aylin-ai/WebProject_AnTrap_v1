@@ -53,11 +53,26 @@ namespace WebVersion.Pages
 
         public IActionResult OnPostAnimeIdPage(int id)
         {
-            return RedirectToPage("/AnimeId", new { animeId = id });
+            if (User.Identity.IsAuthenticated)
+                return RedirectToPage("/AnimeId", new { animeId = id });
+            else
+                return RedirectToPage("Index");
         }
+
         public IActionResult OnPostMangaIdPage(int id)
         {
-            return RedirectToPage("/MangaId", new { mangaId = id });
+            if (User.Identity.IsAuthenticated)
+                return RedirectToPage("/MangaId", new { mangaId = id });
+            else
+                return RedirectToPage("Index");
+        }
+
+        public IActionResult OnPostRanobeIdPage(int id)
+        {
+            if (User.Identity.IsAuthenticated)
+                return RedirectToPage("/RanobeId", new { ranobeId = id });
+            else
+                return RedirectToPage("Index");
         }
 
         public async Task GetAnimeFromUserList()
@@ -90,18 +105,18 @@ namespace WebVersion.Pages
 
                 string sqlAnime = "select * from piece " +
                     "where Piece_UserInformation_Login = @login and " +
-                    "(Piece_Kind = 'манга' or Piece_Kind = 'аниме');";
+                    "(Piece_Kind = 'манга' or Piece_Kind = 'аниме' or Piece_Kind = 'ранобэ');";
                 cmd.CommandText = sqlAnime;
 
                 SelectedLists = new string[Related.Length];
 
-                reader = cmd.ExecuteReader();
+                reader = await cmd.ExecuteReaderAsync();
                 if (reader.HasRows)
                 {
                     for (int i = 0; i < Related.Length; i++)
                     {
                         reader.Close();
-                        reader = cmd.ExecuteReader();
+                        reader = await cmd.ExecuteReaderAsync();
                         while (reader.Read())
                         {
                             if (Related[i].Anime != null)
@@ -118,7 +133,8 @@ namespace WebVersion.Pages
                             }
                             else if (Related[i].Manga != null)
                             {
-                                if (Related[i].Manga.Id == reader.GetInt32(2) && reader.GetString(1) == "манга")
+                                if (Related[i].Manga.Id == reader.GetInt32(2) && (reader.GetString(1) == "манга"
+                                    || reader.GetString(1) == "ранобэ"))
                                 {
                                     SelectedLists[i] = ($"{reader.GetInt32(4)} {reader.GetInt32(2)}");
                                     break;
@@ -133,6 +149,9 @@ namespace WebVersion.Pages
                 }
                 reader.Close();
 
+                sqlAnime = "select * from piece " +
+                    "where Piece_UserInformation_Login = @login and Piece_Kind = 'аниме';";
+                cmd.CommandText = sqlAnime;
                 reader = await cmd.ExecuteReaderAsync();
 
                 SimilarAnimeList = new string[Similar.Length > 8 ? 8 : Similar.Length];
@@ -141,10 +160,10 @@ namespace WebVersion.Pages
                     for (int i = 0; i < (Similar.Length > 8 ? 8 : Similar.Length); i++)
                     {
                         reader.Close();
-                        reader = cmd.ExecuteReader();
+                        reader = await cmd.ExecuteReaderAsync();
                         while (reader.Read())
                         {
-                            if (Similar[i].Id == reader.GetInt32(2) && reader.GetString(1) == "аниме")
+                            if (Similar[i].Id == reader.GetInt32(2))
                             {
                                 SimilarAnimeList[i] = ($"{reader.GetInt32(4)} " +
                                     $"{Similar[i].Id}");
