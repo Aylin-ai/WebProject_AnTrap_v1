@@ -21,10 +21,10 @@ namespace WebVersion.Pages
         public Related?[] Related { get; set; }
         public Anime[] Similar { get; set; }
 
-        public List<string> SelectedList { get; set; } = new List<string>();
+        public string SelectedList { get; set; }
 
-        public List<string> SelectedLists { get; set; } = new List<string>();
-        public List<string> SimilarAnimeList { get; set; } = new List<string>();
+        public string[] SelectedLists { get; set; }
+        public string[] SimilarAnimeList { get; set; }
 
         public AnimeIdModel(IHttpClientFactory httpClientFactory)
         {
@@ -70,9 +70,10 @@ namespace WebVersion.Pages
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.Connection = conn;
 
-                string sql = "select * from anime " +
-                    "where Anime_UserInformation_Login = @login " +
-                    "and Anime_AnimeId = @animeId";
+                string sql = "select * from piece " +
+                    "where Piece_UserInformation_Login = @login " +
+                    "and Piece_PieceId = @animeId " +
+                    "and Piece_Kind = 'аниме'";
                 cmd.CommandText = sql;
                 cmd.Parameters.AddWithValue("@login", User.Identity.Name);
                 cmd.Parameters.AddWithValue("@animeId", Anime.Id);
@@ -82,47 +83,77 @@ namespace WebVersion.Pages
                 {
                     while (reader.Read())
                     {
-                        SelectedList.Add($"{reader.GetInt32(3)} {Anime.Id}");
+                        SelectedList = $"{reader.GetInt32(4)} {Anime.Id}";
                     }
                 }
                 reader.Close();
 
-                string sqlAnime = "select * from anime " +
-                    "where Anime_UserInformation_Login = @login;";
+                string sqlAnime = "select * from piece " +
+                    "where Piece_UserInformation_Login = @login and " +
+                    "(Piece_Kind = 'манга' or Piece_Kind = 'аниме');";
                 cmd.CommandText = sqlAnime;
+
+                SelectedLists = new string[Related.Length];
 
                 reader = cmd.ExecuteReader();
                 if (reader.HasRows)
                 {
-                    for (int i = 0; i < Related.Count(); i++)
+                    for (int i = 0; i < Related.Length; i++)
                     {
+                        reader.Close();
+                        reader = cmd.ExecuteReader();
                         while (reader.Read())
                         {
                             if (Related[i].Anime != null)
                             {
-                                if (Related[i].Anime.Id == reader.GetInt32(1))
-                                    SelectedLists.Add($"{reader.GetInt32(3)} {reader.GetInt32(1)}");
+                                if (Related[i].Anime.Id == reader.GetInt32(2) && reader.GetString(1) == "аниме")
+                                {
+                                    SelectedLists[i] = ($"{reader.GetInt32(4)} {reader.GetInt32(2)}");
+                                    break;
+                                }
+                                else
+                                {
+                                    SelectedLists[i] = ($"0 {Related[i].Anime.Id}");
+                                }
                             }
                             else if (Related[i].Manga != null)
                             {
-                                SelectedLists.Add($"{mangaReader.GetInt32(3)} {mangaReader.GetInt32(1)}");
+                                if (Related[i].Manga.Id == reader.GetInt32(2) && reader.GetString(1) == "манга")
+                                {
+                                    SelectedLists[i] = ($"{reader.GetInt32(4)} {reader.GetInt32(2)}");
+                                    break;
+                                }
+                                else
+                                {
+                                    SelectedLists[i] = ($"0 {Related[i].Manga.Id}");
+                                }
                             }
                         }
                     }
-
                 }
                 reader.Close();
 
-                cmd.CommandText = sqlAnime;
                 reader = await cmd.ExecuteReaderAsync();
+
+                SimilarAnimeList = new string[Similar.Length > 8 ? 8 : Similar.Length];
                 if (reader.HasRows)
                 {
-                    while (reader.Read())
+                    for (int i = 0; i < (Similar.Length > 8 ? 8 : Similar.Length); i++)
                     {
-                        if (Similar.Any(x => x.Id == reader.GetInt32(1)))
+                        reader.Close();
+                        reader = cmd.ExecuteReader();
+                        while (reader.Read())
                         {
-                            SimilarAnimeList.Add($"{reader.GetInt32(3)} " +
-                                $"{(int)Similar.Where(x => x.Id == reader.GetInt32(1)).First().Id}");
+                            if (Similar[i].Id == reader.GetInt32(2) && reader.GetString(1) == "аниме")
+                            {
+                                SimilarAnimeList[i] = ($"{reader.GetInt32(4)} " +
+                                    $"{Similar[i].Id}");
+                                break;
+                            }
+                            else
+                            {
+                                SimilarAnimeList[i] = ($"0 {Similar[i].Id}");
+                            }
                         }
                     }
                 }

@@ -73,9 +73,13 @@
     font-size: 16px;
     max-width: 200px;
 }
-.OtherAnimes select {
-    width: 150px;
-}
+    .OtherAnimes form {
+        max-width: 150px;
+        margin: 5px;
+    }
+    .OtherAnimes form select {
+        width: 150px;
+    }
 .OtherAnimes img {
     width: 150px;
     height: 200px;

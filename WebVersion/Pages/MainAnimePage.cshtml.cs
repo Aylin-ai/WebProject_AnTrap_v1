@@ -148,8 +148,9 @@ namespace WebVersion.Pages
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.Connection = conn;
 
-                string sql = "select * from anime " +
-                    "where Anime_UserInformation_Login = @login";
+                string sql = "select * from piece " +
+                                    "where Piece_UserInformation_Login = @login and " +
+                                    "Piece_Kind = 'аниме'";
                 cmd.CommandText = sql;
                 cmd.Parameters.AddWithValue("@login", User.Identity.Name);
 
@@ -158,7 +159,7 @@ namespace WebVersion.Pages
                 {
                     while (reader.Read())
                     {
-                        AnimeInList[reader.GetInt32(1)] = reader.GetInt32(3);
+                        AnimeInList[reader.GetInt32(2)] = reader.GetInt32(4);
                     }
                 }
             }

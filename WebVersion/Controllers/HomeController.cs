@@ -89,23 +89,25 @@ namespace WebVersion.Controllers
 
                     if (selectedList.Split(" ")[0] == "0")
                     {
-                        sql = "delete from anime " +
-                            "where Anime_AnimeId = @animeId";
+                        sql = "delete from piece " +
+                            "where Piece_PieceId = @animeId and " +
+                            "Piece_Kind = 'аниме'";
                     }
                     else
                     {
                         if (!AnimeInList.Keys.Any(x => x == selectedList.Split(' ')[1]))
                         {
-                            sql = "insert into anime (Anime_AnimeId, Anime_UserInformation_Login, " +
-                                "Anime_ListInformation_Id) values " +
-                                "(@animeId, @user, @listId);";
+                            sql = "insert into piece (Piece_Kind, Piece_PieceId, Piece_UserInformation_Login, " +
+                                "Piece_ListInformation_Id) values " +
+                                "('аниме', @animeId, @user, @listId);";
                         }
                         else
                         {
-                            sql = "update anime " +
-                                "set Anime_ListInformation_Id = @listId " +
-                                "where Anime_AnimeId = @animeId and " +
-                                "Anime_UserInformation_Login = @user;";
+                            sql = "update piece " +
+                                "set Piece_ListInformation_Id = @listId " +
+                                "where Piece_PieceId = @animeId and " +
+                                "Piece_UserInformation_Login = @user " +
+                                "and Piece_Kind = 'аниме';";
                         }
                     }
 
@@ -151,23 +153,25 @@ namespace WebVersion.Controllers
 
                     if (selectedList.Split(" ")[0] == "0")
                     {
-                        sql = "delete from manga " +
-                            "where Manga_MangaId = @mangaId";
+                        sql = "delete from piece " +
+                            "where Piece_PieceId = @mangaId and " +
+                            "Piece_Kind = 'манга'";
                     }
                     else
                     {
                         if (!MangaInList.Keys.Any(x => x == selectedList.Split(' ')[1]))
                         {
-                            sql = "insert into manga (Manga_MangaId, Manga_UserInformation_Login, " +
-                                "Manga_ListInformation_Id) values " +
-                                "(@mangaId, @user, @listId);";
+                            sql = "insert into piece (Piece_Kind, Piece_PieceId, Piece_UserInformation_Login, " +
+                                "Piece_ListInformation_Id) values " +
+                                "('манга', @mangaId, @user, @listId);";
                         }
                         else
                         {
-                            sql = "update manga " +
-                                "set Manga_ListInformation_Id = @listId " +
-                                "where Manga_MangaId = @animeId and " +
-                                "Manga_UserInformation_Login = @user;";
+                            sql = "update piece " +
+                                "set Piece_ListInformation_Id = @listId " +
+                                "where Piece_PieceId = @mangaId and " +
+                                "Piece_UserInformation_Login = @user " +
+                                "and Piece_Kind = 'манга';";
                         }
                     }
 
@@ -213,23 +217,25 @@ namespace WebVersion.Controllers
 
                     if (selectedList.Split(" ")[0] == "0")
                     {
-                        sql = "delete from ranobe " +
-                            "where Ranobe_RanobeId = @ranobeId";
+                        sql = "delete from piece " +
+                            "where Piece_PieceId = @ranobeId and " +
+                            "Piece_Kind = 'ранобэ'";
                     }
                     else
                     {
                         if (!RanobeInList.Keys.Any(x => x == selectedList.Split(' ')[1]))
                         {
-                            sql = "insert into ranobe (Ranobe_RanobeId, Ranobe_UserInformation_Login, " +
-                                "Ranobe_ListInformation_Id) values " +
-                                "(@ranobeId, @user, @listId);";
+                            sql = "insert into piece (Piece_Kind, Piece_PieceId, Piece_UserInformation_Login, " +
+                                "Piece_ListInformation_Id) values " +
+                                "('ранобэ', @ranobeId, @user, @listId);";
                         }
                         else
                         {
-                            sql = "update ranobe " +
-                                "set Ranobe_ListInformation_Id = @listId " +
-                                "where Ranobe_RanobeId = @ranobeId and " +
-                                "Ranobe_UserInformation_Login = @user;";
+                            sql = "update piece " +
+                                "set Piece_ListInformation_Id = @listId " +
+                                "where Piece_PieceId = @ranobeId and " +
+                                "Piece_UserInformation_Login = @user " +
+                                "and Piece_Kind = 'ранобэ';";
                         }
                     }
 
@@ -269,8 +275,9 @@ namespace WebVersion.Controllers
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.Connection = conn;
 
-                string sql = "select * from anime " +
-                    "where Anime_UserInformation_Login = @login";
+                string sql = "select * from piece " +
+                    "where Piece_UserInformation_Login = @login " +
+                    "and Piece_Kind = 'аниме';";
                 cmd.CommandText = sql;
                 cmd.Parameters.AddWithValue("@login", User.Identity.Name);
 
@@ -279,7 +286,7 @@ namespace WebVersion.Controllers
                 {
                     while (reader.Read())
                     {
-                        temporaryDic[reader.GetInt32(1).ToString()] = reader.GetInt32(3).ToString();
+                        temporaryDic[reader.GetInt32(2).ToString()] = reader.GetInt32(4).ToString();
                     }
                 }
                 return temporaryDic;
@@ -308,8 +315,9 @@ namespace WebVersion.Controllers
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.Connection = conn;
 
-                string sql = "select * from manga " +
-                    "where Manga_UserInformation_Login = @login";
+                string sql = "select * from piece " +
+                    "where Piece_UserInformation_Login = @login " +
+                    "and Piece_Kind = 'манга';";
                 cmd.CommandText = sql;
                 cmd.Parameters.AddWithValue("@login", User.Identity.Name);
 
@@ -318,7 +326,7 @@ namespace WebVersion.Controllers
                 {
                     while (reader.Read())
                     {
-                        temporaryDic[reader.GetInt32(1).ToString()] = reader.GetInt32(3).ToString();
+                        temporaryDic[reader.GetInt32(2).ToString()] = reader.GetInt32(4).ToString();
                     }
                 }
                 return temporaryDic;
@@ -346,8 +354,9 @@ namespace WebVersion.Controllers
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.Connection = conn;
 
-                string sql = "select * from ranobe" +
-                    "where Ranobe_UserInformation_Login = @login";
+                string sql = "select * from piece " +
+                    "where Piece_UserInformation_Login = @login " +
+                    "and Piece_Kind = 'ранобэ';";
                 cmd.CommandText = sql;
                 cmd.Parameters.AddWithValue("@login", User.Identity.Name);
 
@@ -356,7 +365,7 @@ namespace WebVersion.Controllers
                 {
                     while (reader.Read())
                     {
-                        temporaryDic[reader.GetInt32(1).ToString()] = reader.GetInt32(3).ToString();
+                        temporaryDic[reader.GetInt32(2).ToString()] = reader.GetInt32(4).ToString();
                     }
                 }
                 return temporaryDic;

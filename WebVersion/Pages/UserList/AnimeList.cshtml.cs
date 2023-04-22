@@ -56,9 +56,10 @@ namespace WebVersion.Pages.UserList
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.Connection = conn;
 
-                string sql = "select Anime_AnimeId from anime " +
-                    "where Anime_UserInformation_Login = @login and " +
-                    "Anime_ListInformation_Id = @listId";
+                string sql = "select Piece_PieceId from piece " +
+                                    "where Piece_UserInformation_Login = @login and " +
+                                    "Piece_ListInformation_Id = @listId and " +
+                                    "Piece_Kind = 'аниме'";
 
                 int listId = 1;
                 switch (selectedList)
