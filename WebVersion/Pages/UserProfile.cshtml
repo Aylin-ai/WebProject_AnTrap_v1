@@ -8,10 +8,12 @@
     <head>
     <link rel="stylesheet" type="text/css" href="~/css/UserProfileStyle.css" asp-append-version="true" />
     </head>
-    <body>
-        <div class="MainContainer">
+<body>
+    <div class="MainContainer">
 
-            <div class="Container1">
+        <div class="Container1">
+
+            <form method="post" asp-page-handler="UserEdit">
 
                 <div class="UserInformContainer">
 
@@ -22,20 +24,20 @@
                         <div class="LabelAndInput">
 
                             <label class="UserLabel">Никнейм</label>
-                            <input type="text" value="@User.Identity.Name.Split(' ')[0]"/>
+                            <input name="UserLogin" type="text" value="@User.Identity.Name" />
 
                         </div>
 
                     </div>
 
-                <div class="LabelAndInput">
-
-                    <label class="UserLabel">Email</label>
-                    <input type="text" value="@Model.OldEmail" />
-
-                </div>
-
                     <div class="ChangePasswordContainer">
+
+                        <div class="LabelAndInput">
+
+                            <label class="UserLabel">Email</label>
+                            <input name="UserEmail" type="text" value="@Model.OldEmail" />
+
+                        </div>
 
                         <div>
 
@@ -45,49 +47,44 @@
 
                         <div class="LabelAndInput">
 
-                            <label class="UserLabel">Текущий пароль</label>
-                            <input type="text" value="@Model.OldPassword"/>
-
-                        </div>
-
-                        <div class="LabelAndInput">
-
                             <label class="UserLabel">Новый пароль</label>
-                            <input type="text"/>
+                            <input name="NewPassword1" type="text" />
 
                         </div>
 
                         <div class="LabelAndInput">
 
                             <label class="UserLabel">Повторить новый пароль</label>
-                            <input type="text"/>
+                            <input name="newPassword2" type="text" />
 
                         </div>
 
                     </div>
 
-                    <button class="SaveButton">Сохранить</button>
+                    <input type="submit" class="SaveButton" value="Сохранить">
 
                     <label>@Model.ErrorMessage</label>
 
                 </div>
 
-                <button class="DeleteAccButton">Удалить аккаунт</button>
+            </form>
 
+            <button class="DeleteAccButton">Удалить аккаунт</button>
 
-            </div>
-
-
-            <div class="SettingsContainer">
-
-                <label class="UserLabel">Настройки</label>
-
-            <a asp-controller="Home" asp-action="AboutAnTrap"><button>О AnTrap</button></a>
-
-                <button>Центр поддержки</button>
-
-            </div>
 
         </div>
-    </body>
+
+
+        <div class="SettingsContainer">
+
+            <label class="UserLabel">Настройки</label>
+
+            <button>О AnTrap</button>
+
+            <button>Центр поддержки</button>
+
+        </div>
+
+    </div>
+</body>
 </html> 

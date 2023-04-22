@@ -28,7 +28,7 @@ namespace WebVersion.ViewComponents
                 {
                     while (reader.Read())
                     {
-                        object? model = reader.GetString(3);
+                        object? model = reader.GetString(4);
                         return View("_UserButton", model);
                     }
                 }
