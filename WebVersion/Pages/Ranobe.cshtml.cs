@@ -118,7 +118,7 @@ namespace WebVersion.Pages
             }
             if (searchRanobe != null)
             {
-                search = await httpClient.GetFromJsonAsync<Ranobe[]>($"/api/ranobe?search={searchRanobe}");
+                search = await httpClient.GetFromJsonAsync<Ranobe[]>($"/api/ranobe?search={searchRanobe}&limit=50");
             }
             List = search.ToList();
             httpClient.Dispose();
@@ -146,21 +146,24 @@ namespace WebVersion.Pages
                 Search = search;
                 await GetRanobe(Search);
             }
-            Id = id;
-            switch (order)
+            else
             {
-                case 1: Order = ShikimoriSharp.Enums.Order.ranked; break;
-                case 2: Order = ShikimoriSharp.Enums.Order.kind; break;
-                case 3: Order = ShikimoriSharp.Enums.Order.popularity; break;
-                case 4: Order = ShikimoriSharp.Enums.Order.name; break;
-                case 5: Order = ShikimoriSharp.Enums.Order.aired_on; break;
-                case 6: Order = ShikimoriSharp.Enums.Order.status; break;
-                case 7: Order = ShikimoriSharp.Enums.Order.random; break;
-                default: Order = ShikimoriSharp.Enums.Order.ranked; break;
+                Id = id;
+                switch (order)
+                {
+                    case 1: Order = ShikimoriSharp.Enums.Order.ranked; break;
+                    case 2: Order = ShikimoriSharp.Enums.Order.kind; break;
+                    case 3: Order = ShikimoriSharp.Enums.Order.popularity; break;
+                    case 4: Order = ShikimoriSharp.Enums.Order.name; break;
+                    case 5: Order = ShikimoriSharp.Enums.Order.aired_on; break;
+                    case 6: Order = ShikimoriSharp.Enums.Order.status; break;
+                    case 7: Order = ShikimoriSharp.Enums.Order.random; break;
+                    default: Order = ShikimoriSharp.Enums.Order.ranked; break;
+                }
+                Status = status;
+                Genre = genre;
+                await GetRanobe(Id, Order, Status, Genre);
             }
-            Status = status;
-            Genre = genre;
-            await GetRanobe(Id, Order, Status, Genre);
         }
 
         public IActionResult OnPostRanobeIdPage(int id)

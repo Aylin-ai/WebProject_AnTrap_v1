@@ -128,10 +128,10 @@ namespace WebVersion.Pages
                 AnimeGenres.Add(new SelectListItem { Value = genres[i].Id.ToString(), Text = genres[i].Russian.ToString() });
             }
 
-            Anime[] search = new Anime[1];
+            Anime[] search = new Anime[5];
             if (searchAnime != null)
             {
-                search = await httpClient.GetFromJsonAsync<Anime[]>($"/api/animes?search={searchAnime}");
+                search = await httpClient.GetFromJsonAsync<Anime[]>($"/api/animes?search={searchAnime}&limit=50");
             }
             AnimeList = search.ToList();
             httpClient.Dispose();
@@ -182,7 +182,10 @@ namespace WebVersion.Pages
 
         public IActionResult OnPostAnimeIdPage(int id)
         {
-            return RedirectToPage("/AnimeId", new { animeId = id });
+            if (User.Identity.IsAuthenticated)
+                return RedirectToPage("/AnimeId", new { animeId = id });
+            else
+                return RedirectToPage("/Index");
         }
 
         public async Task GetAnimesFromUserList()

@@ -131,7 +131,7 @@ namespace WebVersion.Pages
             }
             if (searchManga != null)
             {
-                search = await httpClient.GetFromJsonAsync<Manga[]>($"/api/mangas?search={searchManga}");
+                search = await httpClient.GetFromJsonAsync<Manga[]>($"/api/mangas?search={searchManga}&limit=50");
             }
             List = search.ToList();
             httpClient.Dispose();
@@ -159,22 +159,25 @@ namespace WebVersion.Pages
                 Search = search;
                 await GetMangas(Search);
             }
-            Id = id;
-            switch (order)
+            else
             {
-                case 1: Order = ShikimoriSharp.Enums.Order.ranked; break;
-                case 2: Order = ShikimoriSharp.Enums.Order.kind; break;
-                case 3: Order = ShikimoriSharp.Enums.Order.popularity; break;
-                case 4: Order = ShikimoriSharp.Enums.Order.name; break;
-                case 5: Order = ShikimoriSharp.Enums.Order.aired_on; break;
-                case 6: Order = ShikimoriSharp.Enums.Order.status; break;
-                case 7: Order = ShikimoriSharp.Enums.Order.random; break;
-                default: Order = ShikimoriSharp.Enums.Order.ranked; break;
+                Id = id;
+                switch (order)
+                {
+                    case 1: Order = ShikimoriSharp.Enums.Order.ranked; break;
+                    case 2: Order = ShikimoriSharp.Enums.Order.kind; break;
+                    case 3: Order = ShikimoriSharp.Enums.Order.popularity; break;
+                    case 4: Order = ShikimoriSharp.Enums.Order.name; break;
+                    case 5: Order = ShikimoriSharp.Enums.Order.aired_on; break;
+                    case 6: Order = ShikimoriSharp.Enums.Order.status; break;
+                    case 7: Order = ShikimoriSharp.Enums.Order.random; break;
+                    default: Order = ShikimoriSharp.Enums.Order.ranked; break;
+                }
+                Kind = kind;
+                Status = status;
+                Genre = genre;
+                await GetMangas(Id, Order, Kind, Status, Genre);
             }
-            Kind = kind;
-            Status = status;
-            Genre = genre;
-            await GetMangas(Id, Order, Kind, Status, Genre);
         }
 
         public IActionResult OnPostMangaIdPage(int id)
