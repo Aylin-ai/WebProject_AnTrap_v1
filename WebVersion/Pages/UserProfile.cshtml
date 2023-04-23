@@ -69,7 +69,10 @@
 
             </form>
 
-            <button class="DeleteAccButton">Удалить аккаунт</button>
+            <form method="post">
+                <button class="DeleteAccButton" asp-page-handler="DeleteAccount">Удалить аккаунт</button>
+            </form>
+
 
 
         </div>
@@ -79,9 +82,12 @@
 
             <label class="UserLabel">Настройки</label>
 
-            <button>О AnTrap</button>
+            <form method="post">
 
-            <button>Центр поддержки</button>
+                <button asp-page-handler="AboutAntrap">О AnTrap</button>
+                <button asp-page-handler="CallCenter">Центр поддержки</button>
+
+            </form>
 
         </div>
 

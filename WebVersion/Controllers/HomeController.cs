@@ -27,16 +27,6 @@ namespace WebVersion.Controllers
             _httpClientFactory = httpClientFactory;
         }
 
-        public IActionResult Index()
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                return RedirectToPage("/MainAnimePage");
-            }
-            else
-                return RedirectToPage("/Index");
-        }
-
         public IActionResult Selected(string selectedValue)
         {
             if (User.Identity.IsAuthenticated)

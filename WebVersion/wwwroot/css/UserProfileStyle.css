@@ -14,13 +14,17 @@
     flex-direction: column;
 }
 
-.Container1 img {
-    font-size: 20px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: white;
-    width: 200px;
-    margin: 20px;
-}
+    .Container1 form {
+        align-self: center;
+    }
+
+    .Container1 img {
+        font-size: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: white;
+        width: 200px;
+        margin: 20px;
+    }
 
 .UserInformContainer {
     display: flex;
@@ -73,20 +77,25 @@
     margin-top: 100px;
 }
 
-.SettingsContainer button {
-    background-color: transparent;
-    border: none;
-    border-bottom: 2px solid white;
-    font-size: 20px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: white;
-    margin: 10px 30px;
-}
+    .SettingsContainer form {
+        display: flex;
+        flex-direction: column;
+    }
 
-.SettingsContainer label {
-    border: none;
-    border-bottom: 2px solid white;
-}
+    .SettingsContainer button {
+        background-color: transparent;
+        border: none;
+        border-bottom: 2px solid white;
+        font-size: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: white;
+        margin: 10px 30px;
+    }
+
+    .SettingsContainer label {
+        border: none;
+        border-bottom: 2px solid white;
+    }
 
 .LabelAndInput {
     display: flex;

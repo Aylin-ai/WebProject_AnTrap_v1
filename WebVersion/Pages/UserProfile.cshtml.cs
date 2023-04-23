@@ -192,5 +192,54 @@ namespace WebVersion.Pages
                 return RedirectToPage("Index");
             }
         }
+
+        public async Task<IActionResult> OnPostDeleteAccount()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                MySqlConnection conn = DBUtils.GetDBConnection();
+                conn.Open();
+                try
+                {
+                    string sql = "delete from userinformation where " +
+                        "UserInformation_Login = @login";
+
+                    MySqlCommand cmd = new MySqlCommand();
+                    cmd.CommandText = sql;
+                    cmd.Connection = conn;
+
+                    cmd.Parameters.AddWithValue("@login", User.Identity.Name);
+
+                    await cmd.ExecuteNonQueryAsync();
+
+                    await HttpContext.SignOutAsync("MyCookieAuthenticationScheme");
+                    return RedirectToPage("Index");
+                }
+                catch (Exception ex)
+                {
+                    ErrorMessage = ex.Message;
+                    return Page();
+                }
+                finally
+                {
+                    conn.Close();
+                    conn.Dispose();
+                }
+            }
+            else
+                return RedirectToPage("Index");
+        }
+
+        public IActionResult OnPostAboutAntrap()
+        {
+            return Content("AnTrap - это площадка, на которой вы можете составл€ть свои списки " +
+                "аниме, манги и ранобэ, а также смотреть информацию о них");
+        }
+
+        public IActionResult OnPostCallCenter()
+        {
+            return Content("≈сли у вас возникли вопросы, пишите по следующему email адресу: " +
+                "xportbfgh2821@gmail.com");
+        }
     }
 }
