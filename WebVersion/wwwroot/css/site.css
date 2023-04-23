@@ -45,7 +45,7 @@ body {
 
         .Navigation-Bar .Buttons {
             grid-column: 2;
-            align-content: end;
+            margin-bottom: 10px;
         }
 
         .Navigation-Bar .Buttons button {
