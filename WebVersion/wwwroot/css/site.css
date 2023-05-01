@@ -59,14 +59,6 @@ body {
             margin-right: 10px;
         }
 
-    .Navigation-Bar .Day_Night-Theme {
-        grid-column: 3;
-    }
-
-        .Navigation-Bar .Day_Night-Theme svg {
-            max-width: 70px;
-            max-height: 70px;
-        }
 
 .Body-Content {
     margin: 30px;
