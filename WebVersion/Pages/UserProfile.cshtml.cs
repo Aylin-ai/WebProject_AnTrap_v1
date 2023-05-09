@@ -38,7 +38,7 @@ namespace WebVersion.Pages
                 try
                 {
                     string sql = "select * from userinformation where " +
-                        "UserInformation_Login = @login";
+                        "Login = @login";
 
                     MySqlCommand cmd = new MySqlCommand();
                     cmd.CommandText = sql;
@@ -94,7 +94,7 @@ namespace WebVersion.Pages
                 try
                 {
                     string sql = "select * from userinformation where " +
-                        "UserInformation_Login = @login";
+                        "Login = @login";
 
                     MySqlCommand cmd = new MySqlCommand();
                     cmd.CommandText = sql;
@@ -115,7 +115,7 @@ namespace WebVersion.Pages
                     reader.Close();
 
                     sql = "select * from userinformation where " +
-                        "UserInformation_Login != @login";
+                        "Login != @login";
                     cmd.CommandText = sql;
 
                     reader = await cmd.ExecuteReaderAsync();
@@ -140,13 +140,13 @@ namespace WebVersion.Pages
                     cmd.Parameters.Clear();
 
                     sql = "update userinformation " +
-                        "set UserInformation_Login = @login, " +
-                        "UserInformation_Password = @password, " +
-                        "UserInformation_Email = @email " +
-                        "where UserInformation_Id = @userId;";
+                        "set Login = @login, " +
+                        "Pasword = @password, " +
+                        "Email = @email " +
+                        "where Id = @userId;";
                     cmd.CommandText = sql;
                     cmd.Parameters.AddWithValue("@login", UserLogin);
-                    cmd.Parameters.AddWithValue("password", NewPassword1);
+                    cmd.Parameters.AddWithValue("@password", NewPassword1);
                     cmd.Parameters.AddWithValue("@email", UserEmail);
                     cmd.Parameters.AddWithValue("@userId", _userId);
 
@@ -202,7 +202,7 @@ namespace WebVersion.Pages
                 try
                 {
                     string sql = "delete from userinformation where " +
-                        "UserInformation_Login = @login";
+                        "Login = @login";
 
                     MySqlCommand cmd = new MySqlCommand();
                     cmd.CommandText = sql;

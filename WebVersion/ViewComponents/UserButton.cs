@@ -14,7 +14,7 @@ namespace WebVersion.ViewComponents
             try
             {
                 string sql = "select * from userinformation where " +
-                    "UserInformation_Login = @login";
+                    "Login = @login";
 
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.CommandText = sql;

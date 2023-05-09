@@ -199,8 +199,8 @@ namespace WebVersion.Pages
                 cmd.Connection = conn;
 
                 string sql = "select * from piece " +
-                                    "where Piece_UserInformation_Login = @login and " +
-                                    "Piece_Kind = 'манга'";
+                                    "where UserInformation_Login = @login and " +
+                                    "Kind = 'манга'";
                 cmd.CommandText = sql;
                 cmd.Parameters.AddWithValue("@login", User.Identity.Name);
 

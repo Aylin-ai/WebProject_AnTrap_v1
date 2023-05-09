@@ -50,7 +50,7 @@ namespace WebVersion.Pages
                 try
                 {
                     string sql = "select * from userinformation where " +
-                        "UserInformation_Login = @login";
+                        "Login = @login";
 
                     MySqlCommand cmd = new MySqlCommand();
                     cmd.CommandText = sql;
@@ -70,7 +70,7 @@ namespace WebVersion.Pages
                     {
                         await reader.CloseAsync();
                         sql = "insert into userinformation " +
-                        "(UserInformation_Login, UserInformation_Password) " +
+                        "(Login, Pasword) " +
                         "values (@login, @password);";
 
                         cmd = new MySqlCommand();
@@ -137,7 +137,7 @@ namespace WebVersion.Pages
                 try
                 {
                     string sql = "select * from userinformation where " +
-                        "UserInformation_Login = @login";
+                        "Login = @login";
 
                     MySqlCommand cmd = new MySqlCommand();
                     cmd.CommandText = sql;

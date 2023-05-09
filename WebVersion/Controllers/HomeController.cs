@@ -90,24 +90,24 @@ namespace WebVersion.Controllers
                     if (selectedList.Split(" ")[0] == "0")
                     {
                         sql = "delete from piece " +
-                            "where Piece_PieceId = @animeId and " +
-                            "Piece_Kind = 'аниме'";
+                            "where PieceId = @animeId and " +
+                            "Kind = 'аниме'";
                     }
                     else
                     {
                         if (!AnimeInList.Keys.Any(x => x == selectedList.Split(' ')[1]))
                         {
-                            sql = "insert into piece (Piece_Kind, Piece_PieceId, Piece_UserInformation_Login, " +
-                                "Piece_ListInformation_Id) values " +
+                            sql = "insert into piece (Kind, PieceId, UserInformation_Login, " +
+                                "ListInformation_Id) values " +
                                 "('аниме', @animeId, @user, @listId);";
                         }
                         else
                         {
                             sql = "update piece " +
-                                "set Piece_ListInformation_Id = @listId " +
-                                "where Piece_PieceId = @animeId and " +
-                                "Piece_UserInformation_Login = @user " +
-                                "and Piece_Kind = 'аниме';";
+                                "set ListInformation_Id = @listId " +
+                                "where PieceId = @animeId and " +
+                                "UserInformation_Login = @user " +
+                                "and Kind = 'аниме';";
                         }
                     }
 
@@ -122,6 +122,7 @@ namespace WebVersion.Controllers
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine(ex.Message);
                     return RedirectToPage("/Error");
                 }
                 finally
@@ -154,24 +155,24 @@ namespace WebVersion.Controllers
                     if (selectedList.Split(" ")[0] == "0")
                     {
                         sql = "delete from piece " +
-                            "where Piece_PieceId = @mangaId and " +
-                            "Piece_Kind = 'манга'";
+                            "where PieceId = @mangaId and " +
+                            "Kind = 'манга'";
                     }
                     else
                     {
                         if (!MangaInList.Keys.Any(x => x == selectedList.Split(' ')[1]))
                         {
-                            sql = "insert into piece (Piece_Kind, Piece_PieceId, Piece_UserInformation_Login, " +
-                                "Piece_ListInformation_Id) values " +
+                            sql = "insert into piece (Kind, PieceId, UserInformation_Login, " +
+                                "ListInformation_Id) values " +
                                 "('манга', @mangaId, @user, @listId);";
                         }
                         else
                         {
                             sql = "update piece " +
-                                "set Piece_ListInformation_Id = @listId " +
-                                "where Piece_PieceId = @mangaId and " +
-                                "Piece_UserInformation_Login = @user " +
-                                "and Piece_Kind = 'манга';";
+                                "set ListInformation_Id = @listId " +
+                                "where PieceId = @mangaId and " +
+                                "UserInformation_Login = @user " +
+                                "and Kind = 'манга';";
                         }
                     }
 
@@ -218,24 +219,24 @@ namespace WebVersion.Controllers
                     if (selectedList.Split(" ")[0] == "0")
                     {
                         sql = "delete from piece " +
-                            "where Piece_PieceId = @ranobeId and " +
-                            "Piece_Kind = 'ранобэ'";
+                            "where PieceId = @ranobeId and " +
+                            "Kind = 'ранобэ'";
                     }
                     else
                     {
                         if (!RanobeInList.Keys.Any(x => x == selectedList.Split(' ')[1]))
                         {
-                            sql = "insert into piece (Piece_Kind, Piece_PieceId, Piece_UserInformation_Login, " +
-                                "Piece_ListInformation_Id) values " +
+                            sql = "insert into piece (Kind, PieceId, UserInformation_Login, " +
+                                "ListInformation_Id) values " +
                                 "('ранобэ', @ranobeId, @user, @listId);";
                         }
                         else
                         {
                             sql = "update piece " +
-                                "set Piece_ListInformation_Id = @listId " +
-                                "where Piece_PieceId = @ranobeId and " +
-                                "Piece_UserInformation_Login = @user " +
-                                "and Piece_Kind = 'ранобэ';";
+                                "set ListInformation_Id = @listId " +
+                                "where PieceId = @ranobeId and " +
+                                "serInformation_Login = @user " +
+                                "and Kind = 'ранобэ';";
                         }
                     }
 
@@ -276,8 +277,8 @@ namespace WebVersion.Controllers
                 cmd.Connection = conn;
 
                 string sql = "select * from piece " +
-                    "where Piece_UserInformation_Login = @login " +
-                    "and Piece_Kind = 'аниме';";
+                    "where UserInformation_Login = @login " +
+                    "and Kind = 'аниме';";
                 cmd.CommandText = sql;
                 cmd.Parameters.AddWithValue("@login", User.Identity.Name);
 
@@ -316,8 +317,8 @@ namespace WebVersion.Controllers
                 cmd.Connection = conn;
 
                 string sql = "select * from piece " +
-                    "where Piece_UserInformation_Login = @login " +
-                    "and Piece_Kind = 'манга';";
+                    "where UserInformation_Login = @login " +
+                    "and Kind = 'манга';";
                 cmd.CommandText = sql;
                 cmd.Parameters.AddWithValue("@login", User.Identity.Name);
 
@@ -355,8 +356,8 @@ namespace WebVersion.Controllers
                 cmd.Connection = conn;
 
                 string sql = "select * from piece " +
-                    "where Piece_UserInformation_Login = @login " +
-                    "and Piece_Kind = 'ранобэ';";
+                    "where UserInformation_Login = @login " +
+                    "and Kind = 'ранобэ';";
                 cmd.CommandText = sql;
                 cmd.Parameters.AddWithValue("@login", User.Identity.Name);
 

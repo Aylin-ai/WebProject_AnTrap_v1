@@ -13,8 +13,6 @@ namespace WebVersion.Pages.UserList
         private IHttpClientFactory _httpClientFactory;
         public List<AnimeID> AnimeList { get; set; } = new List<AnimeID>();
 
-        public List<int> CountOfAnimeInList { get; set; } = new List<int>();
-
         public List<string> SelectedList { get; set; } = new List<string>();
 
         public AnimeListModel(IHttpClientFactory httpClientFactory)
@@ -56,10 +54,10 @@ namespace WebVersion.Pages.UserList
                 MySqlCommand cmd = new MySqlCommand();
                 cmd.Connection = conn;
 
-                string sql = "select Piece_PieceId from piece " +
-                                    "where Piece_UserInformation_Login = @login and " +
-                                    "Piece_ListInformation_Id = @listId and " +
-                                    "Piece_Kind = 'аниме'";
+                string sql = "select PieceId from piece " +
+                                    "where UserInformation_Login = @login and " +
+                                    "ListInformation_Id = @listId and " +
+                                    "Kind = 'аниме'";
 
                 int listId = 1;
                 switch (selectedList)

@@ -86,9 +86,9 @@ namespace WebVersion.Pages
                 cmd.Connection = conn;
 
                 string sql = "select * from piece " +
-                    "where Piece_UserInformation_Login = @login " +
-                    "and Piece_PieceId = @animeId " +
-                    "and Piece_Kind = 'аниме'";
+                    "where UserInformation_Login = @login " +
+                    "and PieceId = @animeId " +
+                    "and Kind = 'аниме'";
                 cmd.CommandText = sql;
                 cmd.Parameters.AddWithValue("@login", User.Identity.Name);
                 cmd.Parameters.AddWithValue("@animeId", Anime.Id);
@@ -104,8 +104,8 @@ namespace WebVersion.Pages
                 reader.Close();
 
                 string sqlAnime = "select * from piece " +
-                    "where Piece_UserInformation_Login = @login and " +
-                    "(Piece_Kind = 'манга' or Piece_Kind = 'аниме' or Piece_Kind = 'ранобэ');";
+                    "where UserInformation_Login = @login and " +
+                    "(Kind = 'манга' or Kind = 'аниме' or Kind = 'ранобэ');";
                 cmd.CommandText = sqlAnime;
 
                 SelectedLists = new string[Related.Length];
@@ -150,7 +150,7 @@ namespace WebVersion.Pages
                 reader.Close();
 
                 sqlAnime = "select * from piece " +
-                    "where Piece_UserInformation_Login = @login and Piece_Kind = 'аниме';";
+                    "where UserInformation_Login = @login and Kind = 'аниме';";
                 cmd.CommandText = sqlAnime;
                 reader = await cmd.ExecuteReaderAsync();
 
