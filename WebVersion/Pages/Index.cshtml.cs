@@ -15,6 +15,8 @@ namespace WebVersion.Pages
         private readonly IHttpContextAccessor _httpContextAccessor;
         public string ErrorMessage { get; set; }
         public string UserImageSrc { get; set; }
+        private int _role;
+        private string _userImage = "";
 
         public IndexModel(ILogger<IndexModel> logger, IHttpContextAccessor httpContextAccessor)
         {
@@ -27,7 +29,7 @@ namespace WebVersion.Pages
 
         }
 
-        public async Task<IActionResult> OnPostRegistration(string Login, string Password1, string Password2)
+        public async Task<IActionResult> OnPostRegistration(string Login, string Password1, string Password2, string Email)
         {
             if (!ModelState.IsValid)
             {
@@ -50,28 +52,29 @@ namespace WebVersion.Pages
                 try
                 {
                     string sql = "select * from userinformation where " +
-                        "Login = @login";
+                        "Login = @login or Email = @email;";
 
                     MySqlCommand cmd = new MySqlCommand();
                     cmd.CommandText = sql;
                     cmd.Connection = conn;
 
                     cmd.Parameters.AddWithValue("@login", Login);
+                    cmd.Parameters.AddWithValue("@email", Email);
 
                     var reader = cmd.ExecuteReader();
                     cmd.Parameters.Clear();
 
                     if (reader.HasRows)
                     {
-                        ErrorMessage = "Пользователь с таким логином уже существует";
+                        ErrorMessage = "Пользователь с таким логином или email уже существует";
                         return Page();
                     }
                     else
                     {
                         await reader.CloseAsync();
                         sql = "insert into userinformation " +
-                        "(Login, Pasword) " +
-                        "values (@login, @password);";
+                        "(Login, Pasword, Email, UserRole_Id) " +
+                        "values (@login, @password, @email, 1);";
 
                         cmd = new MySqlCommand();
                         cmd.CommandText = sql;
@@ -79,14 +82,15 @@ namespace WebVersion.Pages
 
                         cmd.Parameters.AddWithValue("@login", Login);
                         cmd.Parameters.AddWithValue("@password", Password1);
+                        cmd.Parameters.AddWithValue("@email", Email);
 
                         await cmd.ExecuteNonQueryAsync();
 
                         var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, $"{Login}"),
-                        new Claim(ClaimTypes.UserData, $"{UserImageSrc}"),
-                        new Claim(ClaimTypes.Role, "User")
+                        new Claim(ClaimTypes.UserData, $"images/OldPif.jpg"),
+                        new Claim(ClaimTypes.Role, "Пользователь")
                     };
 
                         var identity = new ClaimsIdentity(
@@ -156,15 +160,16 @@ namespace WebVersion.Pages
                                 ErrorMessage = "Неправильный логин или пароль";
                                 return Page();
                             }
-                            UserImageSrc = reader.GetString(4);
+                            _userImage = reader.GetString(4);
+                            _role = reader.GetInt32(5);
                         }
                     }
 
                     var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, $"{Login}"),
-                        new Claim(ClaimTypes.UserData, $"{UserImageSrc}"),
-                        new Claim(ClaimTypes.Role, "User")
+                        new Claim(ClaimTypes.UserData, $"{_userImage}"),
+                        new Claim(ClaimTypes.Role, _role == 1 ? "Пользователь" : "Разработчик")
                     };
 
                     var identity = new ClaimsIdentity(

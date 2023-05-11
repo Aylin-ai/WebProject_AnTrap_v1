@@ -4,7 +4,7 @@ using MySql.Data.MySqlClient;
 using ShikimoriSharp.Classes;
 using WebVersion.AdditionalClasses;
 
-namespace WebVersion.Pages.UserList
+namespace WebVersion.Pages
 {
     public class MangaListModel : PageModel
     {

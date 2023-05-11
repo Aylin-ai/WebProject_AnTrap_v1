@@ -1,21 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using MySql.Data.MySqlClient;
 using ShikimoriSharp.Classes;
+using System.Net.Http;
 using WebVersion.AdditionalClasses;
 
-namespace WebVersion.Pages.UserList
+namespace WebVersion.Pages
 {
-    public class RanobeListModel : PageModel
+    public class AnimeListModel : PageModel
     {
         private IHttpClientFactory _httpClientFactory;
-        public List<RanobeId> RanobeList { get; set; } = new List<RanobeId>();
-
-        public List<int> CountOfAnimeInList { get; set; } = new List<int>();
+        public List<AnimeID> AnimeList { get; set; } = new List<AnimeID>();
 
         public List<string> SelectedList { get; set; } = new List<string>();
 
-        public RanobeListModel(IHttpClientFactory httpClientFactory)
+        public AnimeListModel(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }
@@ -24,14 +24,14 @@ namespace WebVersion.Pages.UserList
         {
         }
 
-        public async Task OnPostRanobeListSelect(string selectedList)
+        public async Task OnPostAnimeListSelect(string selectedList)
         {
-            await GetRanobe(selectedList);
+            await GetAnime(selectedList);
         }
 
-        public IActionResult OnPostRanobeIdPage(int id)
+        public IActionResult OnPostAnimeIdPage(int id)
         {
-            return RedirectToPage("/RanobeId", new { ranobeId = id });
+            return RedirectToPage("/AnimeId", new { animeId = id });
         }
 
         public IActionResult OnPostToSettings()
@@ -39,13 +39,13 @@ namespace WebVersion.Pages.UserList
             return RedirectToPage("/UserProfile");
         }
 
-        public async Task GetRanobe(string selectedList = "Читаю")
+        public async Task GetAnime(string selectedList = "Смотрю")
         {
             HttpClient httpClient = _httpClientFactory.CreateClient();
             httpClient.BaseAddress = new Uri("https://shikimori.me");
             httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("User-Agent", "ShikiOAuthTest");
 
-            RanobeList.Clear();
+            AnimeList.Clear();
             MySqlConnection conn = DBUtils.GetDBConnection();
             conn.Open();
 
@@ -55,14 +55,14 @@ namespace WebVersion.Pages.UserList
                 cmd.Connection = conn;
 
                 string sql = "select PieceId from piece " +
-                    "where UserInformation_Login = @login and " +
-                    "ListInformation_Id = @listId and " +
-                    "Kind = 'ранобэ'";
+                                    "where UserInformation_Login = @login and " +
+                                    "ListInformation_Id = @listId and " +
+                                    "Kind = 'аниме'";
 
                 int listId = 1;
                 switch (selectedList)
                 {
-                    case "Читаю":
+                    case "Смотрю":
                         listId = 1;
                         break;
                     case "В планах":
@@ -71,7 +71,7 @@ namespace WebVersion.Pages.UserList
                     case "Брошено":
                         listId = 3;
                         break;
-                    case "Прочитано":
+                    case "Просмотрено":
                         listId = 4;
                         break;
                     case "Любимые":
@@ -87,7 +87,7 @@ namespace WebVersion.Pages.UserList
                 {
                     while (reader.Read())
                     {
-                        RanobeList.Add(await httpClient.GetFromJsonAsync<RanobeId>($"/api/ranobe/{reader.GetInt32(0)}"));
+                        AnimeList.Add(await httpClient.GetFromJsonAsync<AnimeID>($"/api/animes/{reader.GetInt32(0)}"));
                         SelectedList.Add($"{listId} {reader.GetInt32(0)}");
                     }
                 }

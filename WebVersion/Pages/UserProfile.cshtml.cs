@@ -17,12 +17,14 @@ namespace WebVersion.Pages
         private int _userId;
         private string _userName = "";
         private string _email = "";
+        private int _role;
 
         [BindProperty(Name = "login", SupportsGet = true)]
         public string OldLogin { get; set; } = "";
 
         public string OldEmail { get; set; } = "";
         public string OldImageSource { get; set; } = "";
+        
 
         public UserProfileModel(IHttpContextAccessor httpContextAccessor)
         {
@@ -110,6 +112,7 @@ namespace WebVersion.Pages
                         {
                             _userId = reader.GetInt32(0);
                             NewPassword1 ??= reader.GetString(2);
+                            _role = reader.GetInt32(5);
                         }
                     }
                     reader.Close();
@@ -155,7 +158,8 @@ namespace WebVersion.Pages
                     var claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Name, $"{UserLogin}"),
-                        new Claim(ClaimTypes.Role, "User")
+                        new Claim(ClaimTypes.UserData, $"{OldImageSource}"),
+                        new Claim(ClaimTypes.Role, _role == 1 ? "Пользователь" : "Разработчик")
                     };
 
                     var identity = new ClaimsIdentity(

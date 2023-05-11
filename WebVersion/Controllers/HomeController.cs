@@ -53,12 +53,14 @@ namespace WebVersion.Controllers
             {
                 switch (selectedValue)
                 {
+                    case "userList":
+                        return RedirectToPage("/UserList");
                     case "animeList":
-                        return RedirectToPage("/UserList/AnimeList");
+                        return RedirectToPage("/AnimeList");
                     case "mangaList":
-                        return RedirectToPage("/UserList/MangaList");
+                        return RedirectToPage("/MangaList");
                     case "ranobeList":
-                        return RedirectToPage("/UserList/RanobeList");
+                        return RedirectToPage("/RanobeList");
                     case "settings":
                         return RedirectToPage("/UserProfile");
                     case "logout":

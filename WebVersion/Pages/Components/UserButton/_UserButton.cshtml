@@ -1,6 +1,7 @@
 ﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
+@using System.Security.Claims;
 @model string;
 @{
 }
@@ -50,6 +51,10 @@
         <img id="menu-toggle" src=@Model aria-expanded="false" />
 
         <div id="menu" aria-hidden="true">
+            @if (@User.FindFirstValue(ClaimTypes.Role) == "Разработчик")
+            {
+                <button name="selectedValue" action="@Url.Action("SelectionFromUser", "Home")" value="userList">Список пользователей</button>
+            }
             <button name="selectedValue" action="@Url.Action("SelectionFromUser", "Home")" value="animeList">Список Аниме</button>
             <button name="selectedValue" action="@Url.Action("SelectionFromUser", "Home")" value="mangaList">Список Манги</button>
             <button name="selectedValue" action="@Url.Action("SelectionFromUser", "Home")" value="ranobeList">Список Ранобэ</button>

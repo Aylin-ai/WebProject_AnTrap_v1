@@ -1,0 +1,79 @@
+﻿@page
+@model WebVersion.Pages.UserListModel
+@using System.Security.Claims;
+@{
+
+    async Task GetUsers()
+    {
+        for (int i = 0; i < Model.Users.Count; i++)
+        {
+            <div class="AnimeContainer">
+
+                <div class="PictureAndListContainer">
+
+                    <img src=@Model.Users[i].ImageSource alt="Отсутствует" style="width:150px; height:150px;">
+
+                </div>
+
+                <form method="post">
+                    <div class="AnimeInformation">
+                        <label id="AnimeName">@Model.Users[i].Login</label>
+                        <label id="AnimeEnglishName">@("Id - ")@Model.Users[i].Id</label>
+                        <label class="OtherInformation">@("Email - ")@Model.Users[i].Email</label>
+                        <label class="OtherInformation">@("Пароль - ") @Model.Users[i].Password</label>
+                    </div>
+                    <input type="submit" value="Удалить" asp-page-handler="DeleteUser" asp-route-id="@Model.Users[i].Id" />
+                </form>
+
+            </div>
+
+            <hr>
+        }
+    }
+
+}
+
+<html>
+
+<head>
+
+    <link rel="stylesheet" type="text/css" href="~/css/UserListStyle.css" asp-append-version="true" />
+
+</head>
+
+<body>
+
+    <div class="MainContainer">
+
+        <div class="UserContainer">
+
+            <img src=@User.FindFirstValue(ClaimTypes.UserData) alt="Отсутствует">
+
+            <label>@User.Identity.Name</label>
+
+            <div class="SettingButtonContainer">
+                <form method="post">
+                    <button asp-page-handler="ToSettings">Настройки</button>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="Container">
+
+            <div class="AnimeListContainer">
+
+                @{
+                    await GetUsers();
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+
+</body>
+
+</html>
+

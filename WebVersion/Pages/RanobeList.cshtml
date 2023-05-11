@@ -1,5 +1,6 @@
 ﻿@page
-@model WebVersion.Pages.UserList.RanobeListModel
+@model WebVersion.Pages.RanobeListModel
+@using System.Security.Claims;
 @{
 
     async Task GetRanobe()
@@ -64,7 +65,7 @@
 
         <div class="UserContainer">
 
-            <img scr="" />
+            <img src=@User.FindFirstValue(ClaimTypes.UserData) />
 
             <label>@User.Identity.Name</label>
 

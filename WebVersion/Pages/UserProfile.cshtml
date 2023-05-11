@@ -1,5 +1,6 @@
 ﻿@page
 @model WebVersion.Pages.UserProfileModel
+@using System.Security.Claims;
 @{
 }
 
@@ -19,10 +20,11 @@
 
                     <div class="NickAndPictureContainer">
 
-                        <img src=@Model.OldImageSource alt="Отсутствует">
+                        <img src=@User.FindFirstValue(ClaimTypes.UserData) alt="Отсутствует">
 
                         <div class="LabelAndInput">
 
+                            <label class="UserLabel">@User.FindFirstValue(ClaimTypes.Role)</label>
                             <label class="UserLabel">Никнейм</label>
                             <input name="UserLogin" type="text" value="@User.Identity.Name" />
 
