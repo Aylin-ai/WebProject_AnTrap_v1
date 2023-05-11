@@ -8,6 +8,23 @@
 <html>
     <head>
     <link rel="stylesheet" type="text/css" href="~/css/UserProfileStyle.css" asp-append-version="true" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+    <script>
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl("/notificationHub")
+            .build();
+
+        connection.start().then(function () {
+            console.log('SignalR Connected!');
+        }).catch(function (err) {
+            console.log(err);
+        });
+
+        connection.on("ReceiveNotification", function (message) {
+            // Отобразите уведомление пользователю
+            alert(message);
+        });
+    </script>
     </head>
 <body>
     <div class="MainContainer">

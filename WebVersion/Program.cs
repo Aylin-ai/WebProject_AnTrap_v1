@@ -1,3 +1,5 @@
+using WebVersion.AdditionalClasses;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -18,6 +20,7 @@ builder.Services.AddAuthentication(options =>
     options.LoginPath = "/Pages/Index";
     options.LogoutPath = "/Pages/Shared/_Layout";
 });
+builder.Services.AddSignalR();
 
 var app = builder.Build();
 
@@ -39,6 +42,12 @@ app.UseSession();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+app.UseRouting();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHub<NotificationHub>("/notificationHub");
+});
 
 app.MapControllerRoute(
     name: "default",

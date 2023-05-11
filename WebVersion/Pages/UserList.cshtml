@@ -24,6 +24,9 @@
                     </div>
                     <input type="submit" value="Удалить" asp-page-handler="DeleteUser" asp-route-id="@Model.Users[i].Id" />
                 </form>
+                <form method="post" action="@Url.Action("SendNotify", "Home")">
+                    <button name="userId" action="@Url.Action("SendNotify", "Home")" value=@Model.Users[i].Id>Отправить уведомление</button>
+                </form>
 
             </div>
 
