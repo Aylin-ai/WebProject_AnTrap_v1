@@ -1,15 +1,23 @@
+using Firebase.Database;
+using FirebaseAdmin;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using MySql.Data.MySqlClient;
 using ShikimoriSharp.Bases;
 using ShikimoriSharp.Classes;
+using System.Security.Claims;
 using WebVersion.AdditionalClasses;
 
 namespace WebVersion.Pages
 {
     public class RanobeModel : PageModel
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private FirebaseApp app;
+
         public int Page { get; set; } = 1;
         public int Id { get; set; }
         public ShikimoriSharp.Enums.Order Order { get; set; } = ShikimoriSharp.Enums.Order.ranked;
@@ -30,9 +38,11 @@ namespace WebVersion.Pages
 
         public string Search { get; set; }
 
-        public RanobeModel(IHttpClientFactory httpClientFactory)
+        public RanobeModel(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
         {
             _httpClientFactory = httpClientFactory;
+            _httpContextAccessor = httpContextAccessor;
+            app = FirebaseAppProvider.GetFirebaseApp();
             for (int i = 1; i <= 406; i++)
             {
                 Pages.Add(new SelectListItem { Value = i.ToString(), Text = i.ToString() });
@@ -176,37 +186,50 @@ namespace WebVersion.Pages
 
         public async Task GetRanobeFromUserList()
         {
-            MySqlConnection conn = DBUtils.GetDBConnection();
-            conn.Open();
+            var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync("MyCookieAuthenticationScheme");
 
-            try
+            if (authenticateResult.Succeeded && authenticateResult.Principal != null)
             {
-                MySqlCommand cmd = new MySqlCommand();
-                cmd.Connection = conn;
+                var principal1 = authenticateResult.Principal;
 
-                string sql = "select * from piece " +
-                                    "where UserInformation_Login = @login and " +
-                                    "Kind = 'ранобэ'";
-                cmd.CommandText = sql;
-                cmd.Parameters.AddWithValue("@login", User.Identity.Name);
-
-                var reader = await cmd.ExecuteReaderAsync();
-                if (reader.HasRows)
+                // Получение утверждения имени пользователя
+                var emailClaim = principal1.FindFirst(ClaimTypes.Email);
+                var email = emailClaim?.Value;
+                var firebase = new FirebaseClient("https://antrap-firebase-default-rtdb.firebaseio.com/");
+                try
                 {
-                    while (reader.Read())
+                    var result = await firebase.Child("ranobe").OnceAsync<PieceInList>();
+                    var filteredResult = result.Where(item => item.Object.userEmail == email);
+
+                    foreach (var item in filteredResult)
                     {
-                        RanobeInList[reader.GetInt32(2)] = reader.GetInt32(4);
+                        var data = item.Object; // Данные из базы данных
+                        int userList = 0;
+                        switch (data.userList)
+                        {
+                            case "Читаю":
+                                userList = 1;
+                                break;
+                            case "В планах":
+                                userList = 2;
+                                break;
+                            case "Брошено":
+                                userList = 3;
+                                break;
+                            case "Прочитано":
+                                userList = 4;
+                                break;
+                            case "Любимое":
+                                userList = 5;
+                                break;
+                        }
+                        RanobeInList[data.pieceId] = userList;
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
     }

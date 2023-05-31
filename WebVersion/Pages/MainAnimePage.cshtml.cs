@@ -1,19 +1,21 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Extensions.Logging;
-using ShikimoriSharp.Bases;
-using ShikimoriSharp;
-using System.Net.Http;
-using WebVersion.Models;
 using ShikimoriSharp.Classes;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using MySql.Data.MySqlClient;
 using WebVersion.AdditionalClasses;
+using Firebase.Database;
+using System.Security.Claims;
+using FirebaseAdmin;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authentication;
 
 namespace WebVersion.Pages
 {
     public class MainAnimePageModel : PageModel
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private FirebaseApp app;
+
         public int Id { get; set; } = 1;
         public int AnimeId { get; set; }
         public ShikimoriSharp.Enums.Order Order { get; set; } = ShikimoriSharp.Enums.Order.ranked;
@@ -37,9 +39,11 @@ namespace WebVersion.Pages
 
         public string Search { get; set; }
 
-        public MainAnimePageModel(IHttpClientFactory httpClientFactory)
+        public MainAnimePageModel(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
         {
             _httpClientFactory = httpClientFactory;
+            _httpContextAccessor = httpContextAccessor;
+            app = FirebaseAppProvider.GetFirebaseApp();
             for (int i = 1; i <= 406; i++)
             {
                 PagesId.Add(new SelectListItem { Value = i.ToString(), Text = i.ToString() });
@@ -190,38 +194,52 @@ namespace WebVersion.Pages
 
         public async Task GetAnimesFromUserList()
         {
-            MySqlConnection conn = DBUtils.GetDBConnection();
-            conn.Open();
+            var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync("MyCookieAuthenticationScheme");
 
-            try
+            if (authenticateResult.Succeeded && authenticateResult.Principal != null)
             {
-                MySqlCommand cmd = new MySqlCommand();
-                cmd.Connection = conn;
+                var principal1 = authenticateResult.Principal;
 
-                string sql = "select * from piece " +
-                                    "where UserInformation_Login = @login and " +
-                                    "Kind = 'аниме'";
-                cmd.CommandText = sql;
-                cmd.Parameters.AddWithValue("@login", User.Identity.Name);
-
-                var reader = await cmd.ExecuteReaderAsync();
-                if (reader.HasRows)
+                // Получение утверждения имени пользователя
+                var emailClaim = principal1.FindFirst(ClaimTypes.Email);
+                var email = emailClaim?.Value;
+                var firebase = new FirebaseClient("https://antrap-firebase-default-rtdb.firebaseio.com/");
+                try
                 {
-                    while (reader.Read())
+                    var result = await firebase.Child("anime").OnceAsync<PieceInList>();
+                    var filteredResult = result.Where(item => item.Object.userEmail == email);
+
+                    foreach (var item in filteredResult)
                     {
-                        AnimeInList[reader.GetInt32(2)] = reader.GetInt32(4);
+                        var data = item.Object; // Данные из базы данных
+                        int userList = 0;
+                        switch (data.userList)
+                        {
+                            case "Читаю":
+                                userList = 1;
+                                break;
+                            case "В планах":
+                                userList = 2;
+                                break;
+                            case "Брошено":
+                                userList = 3;
+                                break;
+                            case "Прочитано":
+                                userList = 4;
+                                break;
+                            case "Любимое":
+                                userList = 5;
+                                break;
+                        }
+                        AnimeInList[data.pieceId] = userList;
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
     }
 }
+

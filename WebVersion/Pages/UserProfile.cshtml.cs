@@ -137,6 +137,16 @@ namespace WebVersion.Pages
                 var auth = FirebaseAuth.GetAuth(app);
                 try
                 {
+                    var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync("MyCookieAuthenticationScheme");
+
+                    if (authenticateResult.Succeeded && authenticateResult.Principal != null)
+                    {
+                        var principal1 = authenticateResult.Principal;
+
+                        // ѕолучение утверждени€ имени пользовател€
+                        var emailClaim = principal1.FindFirst(ClaimTypes.Email);
+                        OldEmail = emailClaim?.Value;
+                    }
                     var result = await auth.GetUserByEmailAsync(OldEmail);
 
                     var userId = result.Uid;
