@@ -15,15 +15,22 @@
 
                 </div>
 
-                <form method="post">
+                <div style="display:flex; flex-direction:column;">
                     <div class="AnimeInformation">
                         <label id="AnimeName">@Model.Users[i].Login</label>
                         <label id="AnimeEnglishName">@("Id - ")@Model.Users[i].Id</label>
                         <label class="OtherInformation">@("Email - ")@Model.Users[i].Email</label>
                         <label class="OtherInformation">@("Пароль - ") @Model.Users[i].Password</label>
                     </div>
-                    <input type="submit" value="Удалить" asp-page-handler="DeleteUser" asp-route-id="@Model.Users[i].Id" />
-                </form>
+                    <div style="display:flex;">
+                        <form method="post">
+                            <button type="submit" asp-page-handler="DeleteUser" asp-route-id="@Model.Users[i].Id">Удалить</button>
+                        </form>
+                        <form method="post" action="@Url.Action("SendNotify", "Home")">
+                            <button name="userId" action="@Url.Action("SendNotify", "Home")" value=@Model.Users[i].Id>Отправить уведомление</button>
+                        </form>
+                    </div>
+                </div>
 
             </div>
 

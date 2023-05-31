@@ -9,11 +9,11 @@ namespace WebVersion.Pages
     {
         public List<User> Users { get; set; } = new List<User>();
 
-        public async Task OnGetAsync()
+        public void OnGet()
         {
             if (User.Identity.IsAuthenticated)
             {
-                await GetUsers();
+                GetUsers();
             }
         }
 
@@ -33,7 +33,7 @@ namespace WebVersion.Pages
                 cmd.Parameters.AddWithValue("@id", id);
 
                 await cmd.ExecuteNonQueryAsync();
-                return Page();
+                return RedirectToPage("UserList");
             }
             catch (Exception ex)
             {
@@ -46,7 +46,7 @@ namespace WebVersion.Pages
             }
         }
 
-        public async Task GetUsers()
+        public void GetUsers()
         {
             MySqlConnection conn = DBUtils.GetDBConnection();
             conn.Open();
@@ -61,7 +61,7 @@ namespace WebVersion.Pages
 
                 var users = new List<User>();
 
-                var reader = await cmd.ExecuteReaderAsync();
+                var reader = cmd.ExecuteReader();
 
                 if (reader.HasRows)
                 {

@@ -14,18 +14,28 @@ using WebVersion.Pages;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using WebVersion.AdditionalClasses;
+using Microsoft.AspNetCore.SignalR;
 
 namespace WebVersion.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IHubContext<NotificationHub> _hubContext;
         private IHttpClientFactory _httpClientFactory;
         private ILogger logger;
 
-        public HomeController(IHttpClientFactory httpClientFactory)
+        public HomeController(IHttpClientFactory httpClientFactory, IHubContext<NotificationHub> hubContext)
         {
             _httpClientFactory = httpClientFactory;
+            _hubContext = hubContext;
         }
+
+        public async Task<IActionResult> SendNotify(int userId, string message = "Уведомление")
+        {
+            await _hubContext.Clients.User(userId.ToString()).SendAsync("ReceiveNotification", message);
+            return Redirect(Request.Headers["Referer"].ToString());
+        }
+
 
         public IActionResult Selected(string selectedValue)
         {
