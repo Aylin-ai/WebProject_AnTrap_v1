@@ -1,3 +1,7 @@
+using Firebase.Auth;
+using FirebaseAdmin;
+using FirebaseAdmin.Auth;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,75 +18,31 @@ namespace WebVersion.Pages
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public string ErrorMessage { get; set; } = "";
-        private int _userId;
-        private string _userName = "";
-        private string _email = "";
-        private int _role;
 
         [BindProperty(Name = "login", SupportsGet = true)]
-        public string OldLogin { get; set; } = "";
-
-        public string OldEmail { get; set; } = "";
+        public string OldEmail { get; set; }
         public string OldImageSource { get; set; } = "";
+
+        private FirebaseApp app;
         
 
         public UserProfileModel(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
+            app = FirebaseAppProvider.GetFirebaseApp();
         }
 
         public async Task OnGetAsync()
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                MySqlConnection conn = DBUtils.GetDBConnection();
-                conn.Open();
-                try
-                {
-                    string sql = "select * from userinformation where " +
-                        "Login = @login";
-
-                    MySqlCommand cmd = new MySqlCommand();
-                    cmd.CommandText = sql;
-                    cmd.Connection = conn;
-
-                    cmd.Parameters.AddWithValue("@login", User.Identity.Name);
-
-                    var reader = await cmd.ExecuteReaderAsync();
-
-                    if (reader.HasRows)
-                    {
-                        while (reader.Read())
-                        {
-                            _userId = reader.GetInt32(0);
-                            OldImageSource = reader.GetString(4);
-                            OldEmail = reader.GetString(3);
-                            _email = reader.GetString(3);
-                            _userName = reader.GetString(1);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    ErrorMessage = ex.Message;
-                }
-                finally
-                {
-                    conn.Close();
-                    conn.Dispose();
-                }
-            }
-            else
+            if (!User.Identity.IsAuthenticated)
             {
                 RedirectToPage("Index");
             }
         }
 
-        public async Task<IActionResult> OnPostUserEdit(string UserLogin, string UserEmail, 
+        public async Task<IActionResult> OnPostUserEdit(string UserLogin,
             string NewPassword1, string NewPassword2)
         {
-            UserLogin ??= _userName;
-            UserEmail ??= _email;
             if (User.Identity.IsAuthenticated)
             {
                 if (NewPassword1 != NewPassword2)
@@ -90,77 +50,54 @@ namespace WebVersion.Pages
                     ErrorMessage = "Новые пароли не совпадают";
                     return RedirectToPage("UserProfile");
                 }
-
-                MySqlConnection conn = DBUtils.GetDBConnection();
-                conn.Open();
+                var auth = FirebaseAuth.GetAuth(app);
                 try
                 {
-                    string sql = "select * from userinformation where " +
-                        "Login = @login";
+                    var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync("MyCookieAuthenticationScheme");
 
-                    MySqlCommand cmd = new MySqlCommand();
-                    cmd.CommandText = sql;
-                    cmd.Connection = conn;
-
-                    cmd.Parameters.AddWithValue("@login", User.Identity.Name);
-
-                    var reader = await cmd.ExecuteReaderAsync();
-
-                    if (reader.HasRows)
+                    if (authenticateResult.Succeeded && authenticateResult.Principal != null)
                     {
-                        while (reader.Read())
-                        {
-                            _userId = reader.GetInt32(0);
-                            NewPassword1 ??= reader.GetString(2);
-                            _role = reader.GetInt32(5);
-                        }
+                        var principal1 = authenticateResult.Principal;
+
+                        // Получение утверждения имени пользователя
+                        var emailClaim = principal1.FindFirst(ClaimTypes.Email);
+                        OldEmail = emailClaim?.Value;
                     }
-                    reader.Close();
+                    var result = await auth.GetUserByEmailAsync(OldEmail);
 
-                    sql = "select * from userinformation where " +
-                        "Login != @login";
-                    cmd.CommandText = sql;
-
-                    reader = await cmd.ExecuteReaderAsync();
-
-                    if (reader.HasRows)
+                    var userId = result.Uid;
+                    if (UserLogin != null)
                     {
-                        while (reader.Read())
+                        var user = new UserRecordArgs
                         {
-                            if (UserLogin == reader.GetString(1))
-                            {
-                                ErrorMessage = $"Логин {UserLogin} уже занят";
-                                return RedirectToPage("UserProfile");
-                            }
-                            if (UserEmail == reader.GetString(3))
-                            {
-                                ErrorMessage = $"Почта {UserEmail} уже занята";
-                                return RedirectToPage("UserProfile");
-                            }
-                        }
+                            Uid = userId,
+                            DisplayName = UserLogin, // Имя пользователя
+                        };
+                        await auth.UpdateUserAsync(user);
                     }
-                    reader.Close();
-                    cmd.Parameters.Clear();
+                    if (NewPassword1 != null)
+                    {
+                        var user = new UserRecordArgs
+                        {
+                            Uid = userId,
+                            Password = NewPassword1,
+                        };
+                        await auth.UpdateUserAsync(user);
+                    }
 
-                    sql = "update userinformation " +
-                        "set Login = @login, " +
-                        "Pasword = @password, " +
-                        "Email = @email " +
-                        "where Id = @userId;";
-                    cmd.CommandText = sql;
-                    cmd.Parameters.AddWithValue("@login", UserLogin);
-                    cmd.Parameters.AddWithValue("@password", NewPassword1);
-                    cmd.Parameters.AddWithValue("@email", UserEmail);
-                    cmd.Parameters.AddWithValue("@userId", _userId);
+                    var localId = result.Uid;
+                    var userName = result.DisplayName;
+                    var _userImage = result.PhotoUrl;
+                    var role = 1;
 
-                    await cmd.ExecuteNonQueryAsync();
-
+                    // Обработка успешной регистрации и полученных данных пользователя
                     var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.Name, $"{UserLogin}"),
-                        new Claim(ClaimTypes.UserData, $"{OldImageSource}"),
-                        new Claim(ClaimTypes.Role, _role == 1 ? "Пользователь" : "Разработчик")
-                    };
+                                {
+                                    new Claim(ClaimTypes.Name, $"{userName}"),
+                                    new Claim(ClaimTypes.Surname, $"{_userImage}"),
+                                    new Claim(ClaimTypes.Email, $"{OldEmail}"),
+                                    new Claim(ClaimTypes.Role, role == 1 ? "Пользователь" : "Разработчик")
+                                };
 
                     var identity = new ClaimsIdentity(
                         claims, "MyCookieAuthenticationScheme");
@@ -168,7 +105,7 @@ namespace WebVersion.Pages
                     var authProperties = new AuthenticationProperties
                     {
                         IsPersistent = true,
-                        ExpiresUtc = DateTimeOffset.UtcNow.AddMonths(1)
+                        ExpiresUtc = DateTimeOffset.UtcNow.AddHours(1)
                     };
 
                     var principal = new ClaimsPrincipal(identity);
@@ -185,11 +122,6 @@ namespace WebVersion.Pages
                     ErrorMessage = ex.Message;
                     return RedirectToPage("UserProfile");
                 }
-                finally
-                {
-                    conn.Close();
-                    conn.Dispose();
-                }
             }
             else
             {
@@ -197,25 +129,18 @@ namespace WebVersion.Pages
             }
         }
 
+
         public async Task<IActionResult> OnPostDeleteAccount()
         {
             if (User.Identity.IsAuthenticated)
             {
-                MySqlConnection conn = DBUtils.GetDBConnection();
-                conn.Open();
+                var auth = FirebaseAuth.GetAuth(app);
                 try
                 {
-                    string sql = "delete from userinformation where " +
-                        "Login = @login";
+                    var result = await auth.GetUserByEmailAsync(OldEmail);
 
-                    MySqlCommand cmd = new MySqlCommand();
-                    cmd.CommandText = sql;
-                    cmd.Connection = conn;
-
-                    cmd.Parameters.AddWithValue("@login", User.Identity.Name);
-
-                    await cmd.ExecuteNonQueryAsync();
-
+                    var userId = result.Uid;
+                    await auth.DeleteUserAsync(userId);
                     await HttpContext.SignOutAsync("MyCookieAuthenticationScheme");
                     return RedirectToPage("Index");
                 }
@@ -223,11 +148,6 @@ namespace WebVersion.Pages
                 {
                     ErrorMessage = ex.Message;
                     return Page();
-                }
-                finally
-                {
-                    conn.Close();
-                    conn.Dispose();
                 }
             }
             else

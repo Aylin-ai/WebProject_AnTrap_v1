@@ -37,26 +37,21 @@
 
                     <div class="NickAndPictureContainer">
 
-                        <img src=@User.FindFirstValue(ClaimTypes.UserData) alt="Отсутствует">
+                        <img src=@User.FindFirstValue(ClaimTypes.Surname) alt="Отсутствует">
 
                         <div class="LabelAndInput">
 
                             <label class="UserLabel">@User.FindFirstValue(ClaimTypes.Role)</label>
+                            <label name="UserEmail" class="UserLabel">@User.FindFirstValue(ClaimTypes.Email)</label>
+
                             <label class="UserLabel">Никнейм</label>
-                            <input name="UserLogin" type="text" value="@User.Identity.Name" />
+                            <input type="text" name="UserLogin" value="@User.Identity.Name">
 
                         </div>
 
                     </div>
 
                     <div class="ChangePasswordContainer">
-
-                        <div class="LabelAndInput">
-
-                            <label class="UserLabel">Email</label>
-                            <input name="UserEmail" type="text" value="@Model.OldEmail" />
-
-                        </div>
 
                         <div>
 

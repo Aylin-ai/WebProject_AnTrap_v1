@@ -1,0 +1,24 @@
+﻿using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+
+namespace WebVersion.AdditionalClasses
+{
+    public class FirebaseAppProvider
+    {
+        private static FirebaseApp _app;
+
+        public static FirebaseApp GetFirebaseApp()
+        {
+            if (_app == null)
+            {
+                _app = FirebaseApp.Create(new AppOptions
+                {
+                    Credential = GoogleCredential.FromFile("D:\\Учеба\\4335\\Проект\\База данных\\antrap-firebase-firebase-adminsdk-oc7cx-6e72638be5.json")
+                });
+            }
+
+            return _app;
+        }
+    }
+
+}
