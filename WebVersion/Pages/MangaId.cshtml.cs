@@ -1,8 +1,11 @@
+using Firebase.Database;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MySql.Data.MySqlClient;
 using ShikimoriSharp.AdditionalRequests;
 using ShikimoriSharp.Classes;
+using System.Security.Claims;
 using WebVersion.AdditionalClasses;
 
 namespace WebVersion.Pages
@@ -10,6 +13,8 @@ namespace WebVersion.Pages
     public class MangaIdModel : PageModel
     {
         private IHttpClientFactory _httpClientFactory;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
 
         [BindProperty(Name = "mangaId", SupportsGet = true)]
         public int Id { get; set; }
@@ -22,9 +27,10 @@ namespace WebVersion.Pages
         public string[] SelectedLists { get; set; }
         public string[] SimilarMangaList { get; set; }
 
-        public MangaIdModel(IHttpClientFactory httpClientFactory)
+        public MangaIdModel(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
         {
             _httpClientFactory = httpClientFactory;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -76,118 +82,227 @@ namespace WebVersion.Pages
                 return RedirectToPage("Index");
         }
 
-
         public async Task GetMangaFromUserList()
         {
-            MySqlConnection conn = DBUtils.GetDBConnection();
-            conn.Open();
+            var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync("MyCookieAuthenticationScheme");
 
-            try
+            if (authenticateResult.Succeeded && authenticateResult.Principal != null)
             {
-                MySqlCommand cmd = new MySqlCommand();
-                cmd.Connection = conn;
+                var principal1 = authenticateResult.Principal;
 
-                string sql = "select * from piece " +
-                    "where UserInformation_Login = @login " +
-                    "and PieceId = @mangaId " +
-                    "and Kind = 'манга'";
-                cmd.CommandText = sql;
-                cmd.Parameters.AddWithValue("@login", User.Identity.Name);
-                cmd.Parameters.AddWithValue("@mangaId", Manga.Id);
-
-                var reader = await cmd.ExecuteReaderAsync();
-                if (reader.HasRows)
+                // Получение утверждения имени пользователя
+                var emailClaim = principal1.FindFirst(ClaimTypes.Email);
+                var email = emailClaim?.Value;
+                var firebase = new FirebaseClient("https://antrap-firebase-default-rtdb.firebaseio.com/");
+                try
                 {
-                    while (reader.Read())
+                    var animeResult = await firebase.Child("anime").OnceAsync<PieceInList>();
+                    var filteredAnimeResult = animeResult.Where(item => item.Object.userEmail == email);
+
+                    var mangaResult = await firebase.Child("manga").OnceAsync<PieceInList>();
+                    var filteredMangaResult = mangaResult.Where(item => item.Object.userEmail == email);
+
+                    var ranobeResult = await firebase.Child("ranobe").OnceAsync<PieceInList>();
+                    var filteredRanobeResult = ranobeResult.Where(item => item.Object.userEmail == email);
+
+                    if (filteredMangaResult.Any())
                     {
-                        SelectedList = $"{reader.GetInt32(4)} {Manga.Id}";
-                    }
-                }
-                reader.Close();
-
-                string sqlAnime = "select * from piece " +
-                    "where UserInformation_Login = @login and " +
-                    "(Kind = 'манга' or Kind = 'аниме' or Kind = 'ранобэ');";
-                cmd.CommandText = sqlAnime;
-
-                SelectedLists = new string[Related.Length];
-
-                reader = await cmd.ExecuteReaderAsync();
-                if (reader.HasRows)
-                {
-                    for (int i = 0; i < Related.Length; i++)
-                    {
-                        reader.Close();
-                        reader = await cmd.ExecuteReaderAsync();
-                        while (reader.Read())
+                        int userList = 0;
+                        foreach (var item in filteredMangaResult)
                         {
-                            if (Related[i].Anime != null)
+                            if (item.Object.pieceId == Manga.Id)
                             {
-                                if (Related[i].Anime.Id == reader.GetInt32(2) && reader.GetString(1) == "аниме")
+                                switch (item.Object.userList)
                                 {
-                                    SelectedLists[i] = ($"{reader.GetInt32(4)} {reader.GetInt32(2)}");
-                                    break;
+                                    case "Читаю":
+                                        userList = 1;
+                                        break;
+                                    case "В планах":
+                                        userList = 2;
+                                        break;
+                                    case "Брошено":
+                                        userList = 3;
+                                        break;
+                                    case "Прочитано":
+                                        userList = 4;
+                                        break;
+                                    case "Любимое":
+                                        userList = 5;
+                                        break;
                                 }
-                                else
-                                {
-                                    SelectedLists[i] = ($"0 {Related[i].Anime.Id}");
-                                }
-                            }
-                            else if (Related[i].Manga != null)
-                            {
-                                if (Related[i].Manga.Id == reader.GetInt32(2) && (reader.GetString(1) == "манга"
-                                    || reader.GetString(1) == "ранобэ"))
-                                {
-                                    SelectedLists[i] = ($"{reader.GetInt32(4)} {reader.GetInt32(2)}");
-                                    break;
-                                }
-                                else
-                                {
-                                    SelectedLists[i] = ($"0 {Related[i].Manga.Id}");
-                                }
-                            }
-                        }
-                    }
-                }
-                reader.Close();
-
-                sqlAnime = "select * from piece " +
-                    "where UserInformation_Login = @login and Kind = 'манга';";
-                cmd.CommandText = sqlAnime;
-                reader = await cmd.ExecuteReaderAsync();
-
-                SimilarMangaList = new string[Similar.Length > 8 ? 8 : Similar.Length];
-                if (reader.HasRows)
-                {
-                    for (int i = 0; i < (Similar.Length > 8 ? 8 : Similar.Length); i++)
-                    {
-                        reader.Close();
-                        reader = await cmd.ExecuteReaderAsync();
-                        while (reader.Read())
-                        {
-                            if (Similar[i].Id == reader.GetInt32(2))
-                            {
-                                SimilarMangaList[i] = ($"{reader.GetInt32(4)} " +
-                                    $"{Similar[i].Id}");
+                                SelectedList = $"{userList} {Manga.Id}";
                                 break;
                             }
                             else
                             {
-                                SimilarMangaList[i] = ($"0 {Similar[i].Id}");
+                                SelectedList = $"0 {Manga.Id}";
+                            }
+                        }
+                    }
+
+                    SelectedLists = new string[Related.Length];
+
+                    for (int i = 0; i < Related.Length; i++)
+                    {
+                        if (Related[i].Anime != null)
+                        {
+                            if (filteredAnimeResult.Any())
+                            {
+                                int userList = 0;
+                                foreach (var piece in filteredAnimeResult)
+                                {
+                                    if (piece.Object.pieceId == Related[i].Anime.Id)
+                                    {
+                                        switch (piece.Object.userList)
+                                        {
+                                            case "Смотрю":
+                                                userList = 1;
+                                                break;
+                                            case "В планах":
+                                                userList = 2;
+                                                break;
+                                            case "Брошено":
+                                                userList = 3;
+                                                break;
+                                            case "Просмотрено":
+                                                userList = 4;
+                                                break;
+                                            case "Любимое":
+                                                userList = 5;
+                                                break;
+                                        }
+                                        SelectedLists[i] = ($"{userList} {piece.Object.pieceId}");
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        SelectedLists[i] = ($"0 {piece.Object.pieceId}");
+                                    }
+                                }
+                            }
+                        }
+                        else if (Related[i].Manga != null)
+                        {
+                            if (Related[i].Manga.Kind == "light_novel" || Related[i].Manga.Kind == "novel")
+                            {
+                                if (filteredRanobeResult.Any())
+                                {
+                                    int userList = 0;
+                                    foreach (var piece in filteredRanobeResult)
+                                    {
+                                        if (piece.Object.pieceId == Related[i].Manga.Id)
+                                        {
+                                            switch (piece.Object.userList)
+                                            {
+                                                case "Читаю":
+                                                    userList = 1;
+                                                    break;
+                                                case "В планах":
+                                                    userList = 2;
+                                                    break;
+                                                case "Брошено":
+                                                    userList = 3;
+                                                    break;
+                                                case "Прочитано":
+                                                    userList = 4;
+                                                    break;
+                                                case "Любимое":
+                                                    userList = 5;
+                                                    break;
+                                            }
+                                            SelectedLists[i] = ($"{userList} {piece.Object.pieceId}");
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            SelectedLists[i] = ($"0 {piece.Object.pieceId}");
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                if (filteredMangaResult.Any())
+                                {
+                                    int userList = 0;
+                                    foreach (var piece in filteredMangaResult)
+                                    {
+                                        if (piece.Object.pieceId == Related[i].Manga.Id)
+                                        {
+                                            switch (piece.Object.userList)
+                                            {
+                                                case "Читаю":
+                                                    userList = 1;
+                                                    break;
+                                                case "В планах":
+                                                    userList = 2;
+                                                    break;
+                                                case "Брошено":
+                                                    userList = 3;
+                                                    break;
+                                                case "Прочитано":
+                                                    userList = 4;
+                                                    break;
+                                                case "Любимое":
+                                                    userList = 5;
+                                                    break;
+                                            }
+                                            SelectedLists[i] = ($"{userList} {piece.Object.pieceId}");
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            SelectedLists[i] = ($"0 {piece.Object.pieceId}");
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    SimilarMangaList = new string[Similar.Length > 8 ? 8 : Similar.Length];
+                    for (int i = 0; i < (Similar.Length > 8 ? 8 : Similar.Length); i++)
+                    {
+                        if (filteredMangaResult.Any())
+                        {
+                            int userList = 0;
+                            foreach (var piece in filteredMangaResult)
+                            {
+                                if (piece.Object.pieceId == Similar[i].Id)
+                                {
+                                    switch (piece.Object.userList)
+                                    {
+                                        case "Смотрю":
+                                            userList = 1;
+                                            break;
+                                        case "В планах":
+                                            userList = 2;
+                                            break;
+                                        case "Брошено":
+                                            userList = 3;
+                                            break;
+                                        case "Просмотрено":
+                                            userList = 4;
+                                            break;
+                                        case "Любимое":
+                                            userList = 5;
+                                            break;
+                                    }
+                                    SimilarMangaList[i] = ($"{userList} {piece.Object.pieceId}");
+                                    break;
+                                }
+                                else
+                                {
+                                    SimilarMangaList[i] = ($"0 {piece.Object.pieceId}");
+                                }
                             }
                         }
                     }
                 }
-
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message.ToString());
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message.ToString());
+                }
             }
         }
     }

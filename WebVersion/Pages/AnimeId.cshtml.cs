@@ -125,6 +125,11 @@ namespace WebVersion.Pages
                                         break;
                                 }
                                 SelectedList = $"{userList} {Anime.Id}";
+                                break;
+                            }
+                            else
+                            {
+                                SelectedList = ($"0 {Anime.Id}");
                             }
                         }
                     }
@@ -163,6 +168,10 @@ namespace WebVersion.Pages
                                         SelectedLists[i] = ($"{userList} {piece.Object.pieceId}");
                                         break;
                                     }
+                                    else
+                                    {
+                                        SelectedLists[i] = ($"0 {piece.Object.pieceId}");
+                                    }
                                 }
                             }
                         }
@@ -198,6 +207,10 @@ namespace WebVersion.Pages
                                             SelectedLists[i] = ($"{userList} {piece.Object.pieceId}");
                                             break;
                                         }
+                                        else
+                                        {
+                                            SelectedLists[i] = ($"0 {piece.Object.pieceId}");
+                                        }
                                     }
                                 }
                             }
@@ -230,6 +243,10 @@ namespace WebVersion.Pages
                                             }
                                             SelectedLists[i] = ($"{userList} {piece.Object.pieceId}");
                                             break;
+                                        }
+                                        else
+                                        {
+                                            SelectedLists[i] = ($"0 {piece.Object.pieceId}");
                                         }
                                     }
                                 }
@@ -267,6 +284,10 @@ namespace WebVersion.Pages
                                     }
                                     SimilarAnimeList[i] = ($"{userList} {piece.Object.pieceId}");
                                     break;
+                                }
+                                else
+                                {
+                                    SimilarAnimeList[i] = ($"0 {piece.Object.pieceId}");
                                 }
                             }
                         }

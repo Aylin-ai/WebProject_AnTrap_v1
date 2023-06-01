@@ -1,7 +1,12 @@
+using Firebase.Database;
+using FirebaseAdmin;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MySql.Data.MySqlClient;
 using ShikimoriSharp.Classes;
+using System.Security.Claims;
 using WebVersion.AdditionalClasses;
 
 namespace WebVersion.Pages
@@ -9,15 +14,20 @@ namespace WebVersion.Pages
     public class MangaListModel : PageModel
     {
         private IHttpClientFactory _httpClientFactory;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private FirebaseApp app;
+
         public List<MangaID> MangaList { get; set; } = new List<MangaID>();
 
         public List<int> CountOfAnimeInList { get; set; } = new List<int>();
 
         public List<string> SelectedList { get; set; } = new List<string>();
 
-        public MangaListModel(IHttpClientFactory httpClientFactory)
+        public MangaListModel(IHttpClientFactory httpClientFactory, IHttpContextAccessor httpContextAccessor)
         {
             _httpClientFactory = httpClientFactory;
+            _httpContextAccessor = httpContextAccessor;
+            app = FirebaseAppProvider.GetFirebaseApp();
         }
 
         public async void OnGetAsync()
@@ -41,67 +51,57 @@ namespace WebVersion.Pages
 
         public async Task GetManga(string selectedList = "Читаю")
         {
-            HttpClient httpClient = _httpClientFactory.CreateClient();
-            httpClient.BaseAddress = new Uri("https://shikimori.me");
-            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("User-Agent", "ShikiOAuthTest");
+            var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync("MyCookieAuthenticationScheme");
 
-            MangaList.Clear();
-            MySqlConnection conn = DBUtils.GetDBConnection();
-            conn.Open();
-
-            try
+            if (authenticateResult.Succeeded && authenticateResult.Principal != null)
             {
-                MySqlCommand cmd = new MySqlCommand();
-                cmd.Connection = conn;
+                HttpClient httpClient = _httpClientFactory.CreateClient();
+                httpClient.BaseAddress = new Uri("https://shikimori.me");
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("User-Agent", "ShikiOAuthTest");
 
-                string sql = "select PieceId from piece " +
-                                    "where UserInformation_Login = @login and " +
-                                    "ListInformation_Id = @listId and " +
-                                    "Kind = 'манга'";
+                MangaList.Clear();
 
-                int listId = 1;
-                switch (selectedList)
+                var principal1 = authenticateResult.Principal;
+
+                // Получение утверждения имени пользователя
+                var emailClaim = principal1.FindFirst(ClaimTypes.Email);
+                var email = emailClaim?.Value;
+                var firebase = new FirebaseClient("https://antrap-firebase-default-rtdb.firebaseio.com/");
+                try
                 {
-                    case "Читаю":
-                        listId = 1;
-                        break;
-                    case "В планах":
-                        listId = 2;
-                        break;
-                    case "Брошено":
-                        listId = 3;
-                        break;
-                    case "Прочитано":
-                        listId = 4;
-                        break;
-                    case "Любимые":
-                        listId = 5;
-                        break;
-                }
-                cmd.CommandText = sql;
-                cmd.Parameters.AddWithValue("@login", User.Identity.Name);
-                cmd.Parameters.AddWithValue("@listId", listId);
-
-                var reader = await cmd.ExecuteReaderAsync();
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
+                    var result = await firebase.Child("manga").OnceAsync<PieceInList>();
+                    var filteredResult = result.Where(item => item.Object.userEmail == email && item.Object.userList == selectedList);
+                    foreach (var item in filteredResult)
                     {
-                        MangaList.Add(await httpClient.GetFromJsonAsync<MangaID>($"/api/mangas/{reader.GetInt32(0)}"));
-                        SelectedList.Add($"{listId} {reader.GetInt32(0)}");
+                        var data = item.Object; // Данные из базы данных
+                        int userList = 0;
+                        switch (data.userList)
+                        {
+                            case "Читаю":
+                                userList = 1;
+                                break;
+                            case "В планах":
+                                userList = 2;
+                                break;
+                            case "Брошено":
+                                userList = 3;
+                                break;
+                            case "Прочитано":
+                                userList = 4;
+                                break;
+                            case "Любимое":
+                                userList = 5;
+                                break;
+                        }
+                        MangaList.Add(await httpClient.GetFromJsonAsync<MangaID>($"/api/mangas/{data.pieceId}"));
+                        SelectedList.Add($"{userList} {data.pieceId}");
                     }
                 }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-            }
-
-        }
+        } 
     }
 }

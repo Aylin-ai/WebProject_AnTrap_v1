@@ -1,33 +1,32 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using MySql.Data.MySqlClient;
-using System.Data.Common;
-using System.Drawing;
-using System.Net.Http;
-using System.Runtime;
-using System.Text.Json;
-using ShikimoriSharp.Bases;
-using ShikimoriSharp.Classes;
-using ShikimoriSharp;
-using WebVersion.Models;
-using WebVersion.Pages;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using WebVersion.AdditionalClasses;
 using Microsoft.AspNetCore.SignalR;
+using FirebaseAdmin;
+using Firebase.Database;
+using System.Security.Claims;
+using System.Net.Http.Headers;
+using System.IO.Pipelines;
+using System.Text;
 
 namespace WebVersion.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IHubContext<NotificationHub> _hubContext;
         private IHttpClientFactory _httpClientFactory;
         private ILogger logger;
+        private FirebaseApp app;
 
-        public HomeController(IHttpClientFactory httpClientFactory, IHubContext<NotificationHub> hubContext)
+
+        public HomeController(IHttpClientFactory httpClientFactory, IHubContext<NotificationHub> hubContext, IHttpContextAccessor httpContextAccessor)
         {
             _httpClientFactory = httpClientFactory;
             _hubContext = hubContext;
+            app = FirebaseAppProvider.GetFirebaseApp();
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IActionResult> SendNotify(int userId, string message = "Уведомление")
@@ -83,316 +82,417 @@ namespace WebVersion.Controllers
             else
                 return RedirectToPage("/Index");
         }
-
         public async Task<IActionResult> AddAnimeToList(string selectedList)
         {
             if (User.Identity.IsAuthenticated)
             {
-                var AnimeInList = GetAnimesFromUserList();
-                MySqlConnection conn = DBUtils.GetDBConnection();
-                conn.Open();
+                var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync("MyCookieAuthenticationScheme");
 
-                try
+                if (authenticateResult.Succeeded && authenticateResult.Principal != null)
                 {
-                    MySqlCommand cmd = new MySqlCommand();
-                    cmd.Connection = conn;
+                    var principal1 = authenticateResult.Principal;
 
-                    string sql = "";
+                    // Получение утверждения имени пользователя
+                    var emailClaim = principal1.FindFirst(ClaimTypes.Email);
+                    var email = emailClaim?.Value;
 
-                    if (selectedList.Split(" ")[0] == "0")
+                    string UserList = "";
+                    switch (selectedList.Split(' ')[0])
                     {
-                        sql = "delete from piece " +
-                            "where PieceId = @animeId and " +
-                            "Kind = 'аниме'";
+                        case "1":
+                            UserList = "Смотрю";
+                            break;
+                        case "2":
+                            UserList = "В планах";
+                            break;
+                        case "3":
+                            UserList = "Брошено";
+                            break;
+                        case "4":
+                            UserList = "Просмотрено";
+                            break;
+                        case "5":
+                            UserList = "Любимое";
+                            break;
                     }
-                    else
+
+                    var firebase = new FirebaseClient("https://antrap-firebase-default-rtdb.firebaseio.com/");
+                    var httpClient = new HttpClient();
+                    var databaseUrl = "https://antrap-firebase-default-rtdb.firebaseio.com/";
+                    var nodePath = $"anime/{selectedList.Split(' ')[1]} {email.Replace('.', ',')}.json";
+                    try
                     {
-                        if (!AnimeInList.Keys.Any(x => x == selectedList.Split(' ')[1]))
+                        var result = await firebase.Child("anime").OnceAsync<PieceInList>();
+                        var filteredResult = result.Where(item => item.Object.userEmail == email);
+
+                        if (selectedList.Split(" ")[0] == "0")
                         {
-                            sql = "insert into piece (Kind, PieceId, UserInformation_Login, " +
-                                "ListInformation_Id) values " +
-                                "('аниме', @animeId, @user, @listId);";
+                            // Создайте HTTP запрос типа DELETE
+                            var request = new HttpRequestMessage(HttpMethod.Delete, $"{databaseUrl}{nodePath}");
+
+                            // Отправьте HTTP запрос и получите ответ
+                            var response = await httpClient.SendAsync(request);
+
+                            // Проверьте статусный код ответа
+                            if (response.IsSuccessStatusCode)
+                            {
+                                Console.WriteLine("Данные успешно удалены из Firebase Realtime Database.");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Произошла ошибка при удалении данных: {response.StatusCode}");
+                            }
                         }
                         else
                         {
-                            sql = "update piece " +
-                                "set ListInformation_Id = @listId " +
-                                "where PieceId = @animeId and " +
-                                "UserInformation_Login = @user " +
-                                "and Kind = 'аниме';";
+                            if (!filteredResult.Any(x => x.Object.pieceId.ToString() == selectedList.Split(' ')[1]))
+                            {
+                                // Создайте объект с данными для отправки
+                                PieceInList data = new PieceInList()
+                                {
+                                    pieceId = int.Parse(selectedList.Split(' ')[1]),
+                                    userEmail = email,
+                                    userList = UserList
+                                };
+
+                                // Преобразуйте объект с данными в JSON строку
+                                var jsonData = Newtonsoft.Json.JsonConvert.SerializeObject(data);
+
+                                // Создайте HTTP запрос типа POST
+                                var request = new HttpRequestMessage(HttpMethod.Put, $"{databaseUrl}{nodePath}")
+                                {
+                                    Content = new StringContent(jsonData)
+                                };
+
+                                // Установите заголовок "Content-Type" для указания типа содержимого
+                                request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                                // Отправьте HTTP запрос и получите ответ
+                                var response = await httpClient.SendAsync(request);
+
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    Console.WriteLine("Данные успешно отправлены в Firebase Realtime Database.");
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Произошла ошибка при отправке данных: {response.StatusCode}");
+                                }
+                            }
+                            else
+                            {
+                                PieceInList pieceInList = new PieceInList()
+                                {
+                                    pieceId = int.Parse(selectedList.Split(" ")[1]),
+                                    userEmail = email,
+                                    userList = UserList
+                                };
+                                var jsonData = Newtonsoft.Json.JsonConvert.SerializeObject(pieceInList);
+                                var request = new HttpRequestMessage(new HttpMethod("PATCH"), $"{databaseUrl}{nodePath}")
+                                {
+                                    Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
+                                };
+                                var response = await httpClient.SendAsync(request);
+
+                                // Проверьте статусный код ответа
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    Console.WriteLine("Данные успешно обновлены в Firebase Realtime Database.");
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Произошла ошибка при обновлении данных: {response.StatusCode}");
+                                }
+                            }
                         }
+                        return Redirect(Request.Headers["Referer"].ToString());
                     }
-
-                    cmd.CommandText = sql;
-                    cmd.Parameters.AddWithValue("@animeId", selectedList.Split(" ")[1]);
-                    cmd.Parameters.AddWithValue("@user", User.Identity.Name);
-                    cmd.Parameters.AddWithValue("@listId", selectedList.Split(" ")[0]);
-
-                    await cmd.ExecuteNonQueryAsync();
-                    AnimeInList.Clear();
-                    return Redirect(Request.Headers["Referer"].ToString());
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error: {ex.Message}");
+                        return Redirect(Request.Headers["Referer"].ToString());
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    return RedirectToPage("/Error");
-                }
-                finally
-                {
-                    conn.Close();
-                    conn.Dispose();
-                }
-
+                else
+                    return RedirectToPage("/Index");
             }
             else
                 return RedirectToPage("/Index");
         }
-
         public async Task<IActionResult> AddMangaToList(string selectedList)
         {
             if (User.Identity.IsAuthenticated)
             {
-                var MangaInList = GetMangasFromUserList();
+                var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync("MyCookieAuthenticationScheme");
 
-                MySqlConnection conn = DBUtils.GetDBConnection();
-                conn.Open();
-
-                try
+                if (authenticateResult.Succeeded && authenticateResult.Principal != null)
                 {
-                    MySqlCommand cmd = new MySqlCommand();
-                    cmd.Connection = conn;
+                    var principal1 = authenticateResult.Principal;
 
-                    string sql = "";
+                    // Получение утверждения имени пользователя
+                    var emailClaim = principal1.FindFirst(ClaimTypes.Email);
+                    var email = emailClaim?.Value;
 
-                    if (selectedList.Split(" ")[0] == "0")
+                    string UserList = "";
+                    switch (selectedList.Split(' ')[0])
                     {
-                        sql = "delete from piece " +
-                            "where PieceId = @mangaId and " +
-                            "Kind = 'манга'";
+                        case "1":
+                            UserList = "Читаю";
+                            break;
+                        case "2":
+                            UserList = "В планах";
+                            break;
+                        case "3":
+                            UserList = "Брошено";
+                            break;
+                        case "4":
+                            UserList = "Прочитано";
+                            break;
+                        case "5":
+                            UserList = "Любимое";
+                            break;
                     }
-                    else
+
+                    var firebase = new FirebaseClient("https://antrap-firebase-default-rtdb.firebaseio.com/");
+                    var httpClient = new HttpClient();
+                    var databaseUrl = "https://antrap-firebase-default-rtdb.firebaseio.com/";
+                    var nodePath = $"manga/{selectedList.Split(' ')[1]}%20{email.Replace('.', ',')}.json";
+                    try
                     {
-                        if (!MangaInList.Keys.Any(x => x == selectedList.Split(' ')[1]))
+                        var result = await firebase.Child("manga").OnceAsync<PieceInList>();
+                        var filteredResult = result.Where(item => item.Object.userEmail == email);
+
+                        if (selectedList.Split(" ")[0] == "0")
                         {
-                            sql = "insert into piece (Kind, PieceId, UserInformation_Login, " +
-                                "ListInformation_Id) values " +
-                                "('манга', @mangaId, @user, @listId);";
+                            // Создайте HTTP запрос типа DELETE
+                            var request = new HttpRequestMessage(HttpMethod.Delete, $"{databaseUrl}{nodePath}");
+
+                            // Отправьте HTTP запрос и получите ответ
+                            var response = await httpClient.SendAsync(request);
+
+                            // Проверьте статусный код ответа
+                            if (response.IsSuccessStatusCode)
+                            {
+                                Console.WriteLine("Данные успешно удалены из Firebase Realtime Database.");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Произошла ошибка при удалении данных: {response.StatusCode}");
+                            }
                         }
                         else
                         {
-                            sql = "update piece " +
-                                "set ListInformation_Id = @listId " +
-                                "where PieceId = @mangaId and " +
-                                "UserInformation_Login = @user " +
-                                "and Kind = 'манга';";
+                            if (!filteredResult.Any(x => x.Object.pieceId.ToString() == selectedList.Split(' ')[1]))
+                            {
+                                // Создайте объект с данными для отправки
+                                PieceInList data = new PieceInList()
+                                {
+                                    pieceId = int.Parse(selectedList.Split(' ')[1]),
+                                    userEmail = email,
+                                    userList = UserList
+                                };
+
+                                // Преобразуйте объект с данными в JSON строку
+                                var jsonData = Newtonsoft.Json.JsonConvert.SerializeObject(data);
+
+                                // Создайте HTTP запрос типа POST
+                                var request = new HttpRequestMessage(HttpMethod.Put, $"{databaseUrl}{nodePath}")
+                                {
+                                    Content = new StringContent(jsonData)
+                                };
+
+                                // Установите заголовок "Content-Type" для указания типа содержимого
+                                request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                                // Отправьте HTTP запрос и получите ответ
+                                var response = await httpClient.SendAsync(request);
+
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    Console.WriteLine("Данные успешно отправлены в Firebase Realtime Database.");
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Произошла ошибка при отправке данных: {response.StatusCode}");
+                                }
+                            }
+                            else
+                            {
+                                PieceInList pieceInList = new PieceInList()
+                                {
+                                    pieceId = int.Parse(selectedList.Split(" ")[1]),
+                                    userEmail = email,
+                                    userList = UserList
+                                };
+                                var jsonData = Newtonsoft.Json.JsonConvert.SerializeObject(pieceInList);
+                                var request = new HttpRequestMessage(new HttpMethod("PATCH"), $"{databaseUrl}{nodePath}")
+                                {
+                                    Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
+                                };
+                                var response = await httpClient.SendAsync(request);
+
+                                // Проверьте статусный код ответа
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    Console.WriteLine("Данные успешно обновлены в Firebase Realtime Database.");
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Произошла ошибка при обновлении данных: {response.StatusCode}");
+                                }
+                            }
                         }
+                        httpClient.Dispose();
+                        return Redirect(Request.Headers["Referer"].ToString());
                     }
-
-                    cmd.CommandText = sql;
-                    cmd.Parameters.AddWithValue("@mangaId", selectedList.Split(" ")[1]);
-                    cmd.Parameters.AddWithValue("@user", User.Identity.Name);
-                    cmd.Parameters.AddWithValue("@listId", selectedList.Split(" ")[0]);
-
-                    await cmd.ExecuteNonQueryAsync();
-                    MangaInList.Clear();
-                    return Redirect(Request.Headers["Referer"].ToString());
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error: {ex.InnerException.ToString()}");
+                        return Redirect(Request.Headers["Referer"].ToString());
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    return RedirectToPage("/Error");
-                }
-                finally
-                {
-                    conn.Close();
-                    conn.Dispose();
-                }
+                else
+                    return RedirectToPage("/Index");
             }
             else
                 return RedirectToPage("/Index");
         }
-
         public async Task<IActionResult> AddRanobeToList(string selectedList)
         {
             if (User.Identity.IsAuthenticated)
             {
-                var RanobeInList = GetRanobeFromUserList();
+                var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync("MyCookieAuthenticationScheme");
 
-                MySqlConnection conn = DBUtils.GetDBConnection();
-                conn.Open();
-
-                try
+                if (authenticateResult.Succeeded && authenticateResult.Principal != null)
                 {
-                    MySqlCommand cmd = new MySqlCommand();
-                    cmd.Connection = conn;
+                    var principal1 = authenticateResult.Principal;
 
-                    string sql = "";
+                    // Получение утверждения имени пользователя
+                    var emailClaim = principal1.FindFirst(ClaimTypes.Email);
+                    var email = emailClaim?.Value;
 
-                    if (selectedList.Split(" ")[0] == "0")
+                    string UserList = "";
+                    switch (selectedList.Split(' ')[0])
                     {
-                        sql = "delete from piece " +
-                            "where PieceId = @ranobeId and " +
-                            "Kind = 'ранобэ'";
+                        case "1":
+                            UserList = "Читаю";
+                            break;
+                        case "2":
+                            UserList = "В планах";
+                            break;
+                        case "3":
+                            UserList = "Брошено";
+                            break;
+                        case "4":
+                            UserList = "Прочитано";
+                            break;
+                        case "5":
+                            UserList = "Любимое";
+                            break;
                     }
-                    else
+
+                    var firebase = new FirebaseClient("https://antrap-firebase-default-rtdb.firebaseio.com/");
+                    var httpClient = new HttpClient();
+                    var databaseUrl = "https://antrap-firebase-default-rtdb.firebaseio.com/";
+                    var nodePath = $"ranobe/{selectedList.Split(' ')[1]} {email.Replace('.', ',')}.json";
+                    try
                     {
-                        if (!RanobeInList.Keys.Any(x => x == selectedList.Split(' ')[1]))
+                        var result = await firebase.Child("ranobe").OnceAsync<PieceInList>();
+                        var filteredResult = result.Where(item => item.Object.userEmail == email);
+
+                        if (selectedList.Split(" ")[0] == "0")
                         {
-                            sql = "insert into piece (Kind, PieceId, UserInformation_Login, " +
-                                "ListInformation_Id) values " +
-                                "('ранобэ', @ranobeId, @user, @listId);";
+                            // Создайте HTTP запрос типа DELETE
+                            var request = new HttpRequestMessage(HttpMethod.Delete, $"{databaseUrl}{nodePath}");
+
+                            // Отправьте HTTP запрос и получите ответ
+                            var response = await httpClient.SendAsync(request);
+
+                            // Проверьте статусный код ответа
+                            if (response.IsSuccessStatusCode)
+                            {
+                                Console.WriteLine("Данные успешно удалены из Firebase Realtime Database.");
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Произошла ошибка при удалении данных: {response.StatusCode}");
+                            }
                         }
                         else
                         {
-                            sql = "update piece " +
-                                "set ListInformation_Id = @listId " +
-                                "where PieceId = @ranobeId and " +
-                                "serInformation_Login = @user " +
-                                "and Kind = 'ранобэ';";
+                            if (!filteredResult.Any(x => x.Object.pieceId.ToString() == selectedList.Split(' ')[1]))
+                            {
+                                // Создайте объект с данными для отправки
+                                PieceInList data = new PieceInList()
+                                {
+                                    pieceId = int.Parse(selectedList.Split(' ')[1]),
+                                    userEmail = email,
+                                    userList = UserList
+                                };
+
+                                // Преобразуйте объект с данными в JSON строку
+                                var jsonData = Newtonsoft.Json.JsonConvert.SerializeObject(data);
+
+                                // Создайте HTTP запрос типа POST
+                                var request = new HttpRequestMessage(HttpMethod.Put, $"{databaseUrl}{nodePath}")
+                                {
+                                    Content = new StringContent(jsonData)
+                                };
+
+                                // Установите заголовок "Content-Type" для указания типа содержимого
+                                request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                                // Отправьте HTTP запрос и получите ответ
+                                var response = await httpClient.SendAsync(request);
+
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    Console.WriteLine("Данные успешно отправлены в Firebase Realtime Database.");
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Произошла ошибка при отправке данных: {response.StatusCode}");
+                                }
+                            }
+                            else
+                            {
+                                PieceInList pieceInList = new PieceInList()
+                                {
+                                    pieceId = int.Parse(selectedList.Split(" ")[1]),
+                                    userEmail = email,
+                                    userList = UserList
+                                };
+                                var jsonData = Newtonsoft.Json.JsonConvert.SerializeObject(pieceInList);
+                                var request = new HttpRequestMessage(new HttpMethod("PATCH"), $"{databaseUrl}{nodePath}")
+                                {
+                                    Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
+                                };
+                                var response = await httpClient.SendAsync(request);
+
+                                // Проверьте статусный код ответа
+                                if (response.IsSuccessStatusCode)
+                                {
+                                    Console.WriteLine("Данные успешно обновлены в Firebase Realtime Database.");
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Произошла ошибка при обновлении данных: {response.StatusCode}");
+                                }
+                            }
                         }
+                        return Redirect(Request.Headers["Referer"].ToString());
                     }
-
-                    cmd.CommandText = sql;
-                    cmd.Parameters.AddWithValue("@ranobeId", selectedList.Split(" ")[1]);
-                    cmd.Parameters.AddWithValue("@user", User.Identity.Name);
-                    cmd.Parameters.AddWithValue("@listId", selectedList.Split(" ")[0]);
-
-                    await cmd.ExecuteNonQueryAsync();
-                    RanobeInList.Clear();
-                    return Redirect(Request.Headers["Referer"].ToString());
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error: {ex.Message}");
+                        return Redirect(Request.Headers["Referer"].ToString());
+                    }
                 }
-                catch (Exception ex)
-                {
-                    return RedirectToPage("/Error");
-                }
-                finally
-                {
-                    conn.Close();
-                    conn.Dispose();
-                }
+                else
+                    return RedirectToPage("/Index");
             }
             else
                 return RedirectToPage("/Index");
-        }
-
-
-        public Dictionary<string, string> GetAnimesFromUserList()
-        {
-            MySqlConnection conn = DBUtils.GetDBConnection();
-            conn.Open();
-
-            Dictionary<string, string> temporaryDic = new Dictionary<string, string>();
-
-            try
-            {
-                MySqlCommand cmd = new MySqlCommand();
-                cmd.Connection = conn;
-
-                string sql = "select * from piece " +
-                    "where UserInformation_Login = @login " +
-                    "and Kind = 'аниме';";
-                cmd.CommandText = sql;
-                cmd.Parameters.AddWithValue("@login", User.Identity.Name);
-
-                var reader = cmd.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        temporaryDic[reader.GetInt32(2).ToString()] = reader.GetInt32(4).ToString();
-                    }
-                }
-                return temporaryDic;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return new Dictionary<string, string>();
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-            }
-        }
-
-        public Dictionary<string, string> GetMangasFromUserList()
-        {
-            MySqlConnection conn = DBUtils.GetDBConnection();
-            conn.Open();
-
-            Dictionary<string, string> temporaryDic = new Dictionary<string, string>();
-
-            try
-            {
-                MySqlCommand cmd = new MySqlCommand();
-                cmd.Connection = conn;
-
-                string sql = "select * from piece " +
-                    "where UserInformation_Login = @login " +
-                    "and Kind = 'манга';";
-                cmd.CommandText = sql;
-                cmd.Parameters.AddWithValue("@login", User.Identity.Name);
-
-                var reader = cmd.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        temporaryDic[reader.GetInt32(2).ToString()] = reader.GetInt32(4).ToString();
-                    }
-                }
-                return temporaryDic;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return new Dictionary<string, string>();
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-            }
-        }
-
-        public Dictionary<string, string> GetRanobeFromUserList()
-        {
-            MySqlConnection conn = DBUtils.GetDBConnection();
-            conn.Open();
-            Dictionary<string, string> temporaryDic = new Dictionary<string, string>();
-
-            try
-            {
-                MySqlCommand cmd = new MySqlCommand();
-                cmd.Connection = conn;
-
-                string sql = "select * from piece " +
-                    "where UserInformation_Login = @login " +
-                    "and Kind = 'ранобэ';";
-                cmd.CommandText = sql;
-                cmd.Parameters.AddWithValue("@login", User.Identity.Name);
-
-                var reader = cmd.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    while (reader.Read())
-                    {
-                        temporaryDic[reader.GetInt32(2).ToString()] = reader.GetInt32(4).ToString();
-                    }
-                }
-                return temporaryDic;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return new Dictionary<string, string>();
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-            }
         }
     }
 }
