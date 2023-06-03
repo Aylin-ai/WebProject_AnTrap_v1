@@ -18,7 +18,7 @@ namespace WebVersion.Pages
         private readonly IHttpContextAccessor _httpContextAccessor;
         public string ErrorMessage { get; set; }
         public string UserImageSrc { get; set; }
-        private int _role;
+        private string _role;
         private string userName = "";
         private string userEmail = "";
         private string _userImage = "";
@@ -92,6 +92,7 @@ namespace WebVersion.Pages
                         Login = user.DisplayName,
                         Email = Email,
                         ImageSource = user.PhotoUrl,
+                        Role = "Пользователь"
                     };
                     // Преобразуйте объект с данными в JSON строку
                     var jsonData = Newtonsoft.Json.JsonConvert.SerializeObject(newUser);
@@ -123,7 +124,7 @@ namespace WebVersion.Pages
                                     new Claim(ClaimTypes.Name, $"{userName}"),
                                     new Claim(ClaimTypes.Surname, $"{_userImage}"),
                                     new Claim(ClaimTypes.Email, $"{Email}"),
-                                    new Claim(ClaimTypes.Role, _role == 1 ? "Пользователь" : "Разработчик")
+                                    new Claim(ClaimTypes.Role, "Пользователь")
                                 };
 
                     var identity = new ClaimsIdentity(
@@ -188,8 +189,12 @@ namespace WebVersion.Pages
                                 userName = user.DisplayName;
                                 refreshIdToken = result.refreshToken;
                                 _userImage = user.PhotoUrl;
-                                _role = 2;
-                                FirebaseAppProvider.FIREBASE_ID_TOKEN = result.idToken;
+
+                                var firebase = new FirebaseClient("https://antrap-firebase-default-rtdb.firebaseio.com/");
+                                var userResult = await firebase.Child("users").OnceAsync<User>();
+                                var filteredResult = userResult.Where(item => item.Object.Email == Email);
+
+                                _role = filteredResult.First().Object.Role;
                             }
                             catch (FirebaseAuthException ex)
                             {
@@ -202,7 +207,7 @@ namespace WebVersion.Pages
                                     new Claim(ClaimTypes.Name, $"{userName}"),
                                     new Claim(ClaimTypes.Surname, $"{_userImage}"),
                                     new Claim(ClaimTypes.Email, $"{userEmail}"),
-                                    new Claim(ClaimTypes.Role, _role == 1 ? "Пользователь" : "Разработчик")
+                                    new Claim(ClaimTypes.Role, _role)
                                 };
 
                             var identity = new ClaimsIdentity(
