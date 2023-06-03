@@ -75,142 +75,152 @@
 
             <div>
                 <label id="Description">@Model.Ranobe.Description</label>
-                <hr>
 
                 <div class="Other">
-                    <label id="RelatedLabel">Связанное</label>
-                    <div class="Related">
-                        @for (int i = 0; i < Model.Related.Length; i++)
-                        {
-                            if (Model.Related[i].Anime != null)
+                    @if (Model.Related.Length != 0)
+                    {
+                        <label id="RelatedLabel">Связанное</label>
+                        <div class="Related">
+                            @for (int i = 0; i < Model.Related.Length; i++)
                             {
-                                <div class="RelatedAnime">
-                                    <div class="ImageAndSelect">
-                                        <img src=@("https://shikimori.me")@Model.Related[i].Anime.Image.Original alt="Отсутствует">
-                                        <form method="post" action="@Url.Action("AddAnimeToList", "Home")">
-                                            <select name="selectedList" action="@Url.Action("AddAnimeToList", "Home")"
+                                if (Model.Related[i].Anime != null)
+                                {
+                                    <div class="RelatedAnime">
+                                        <div class="ImageAndSelect">
+                                            <img src=@("https://shikimori.me")@Model.Related[i].Anime.Image.Original alt="Отсутствует">
+                                            <form method="post" action="@Url.Action("AddAnimeToList", "Home")">
+                                                <select name="selectedList" action="@Url.Action("AddAnimeToList", "Home")"
                                             asp-for="SelectedLists[i]" onchange="this.form.submit()">
-                                                <option value="0 @Model.Related[i].Anime.Id">Нет</option>
-                                                <option value="1 @Model.Related[i].Anime.Id">Смотрю</option>
-                                                <option value="2 @Model.Related[i].Anime.Id">В планах</option>
-                                                <option value="3 @Model.Related[i].Anime.Id">Брошено</option>
-                                                <option value="4 @Model.Related[i].Anime.Id">Просмотрено</option>
-                                                <option value="5 @Model.Related[i].Anime.Id">Любимые</option>
-                                            </select>
-                                        </form>
-                                    </div>
-                                    <div>
-                                        <div class="FiltrLabel">
-                                            <label>@Model.Related[i].Anime.Russian</label>
+                                                    <option value="0 @Model.Related[i].Anime.Id">Нет</option>
+                                                    <option value="1 @Model.Related[i].Anime.Id">Смотрю</option>
+                                                    <option value="2 @Model.Related[i].Anime.Id">В планах</option>
+                                                    <option value="3 @Model.Related[i].Anime.Id">Брошено</option>
+                                                    <option value="4 @Model.Related[i].Anime.Id">Просмотрено</option>
+                                                    <option value="5 @Model.Related[i].Anime.Id">Любимые</option>
+                                                </select>
+                                            </form>
                                         </div>
-                                        <label>@Model.Related[i].Anime.Kind@("/")@Model.Related[i].Anime.Status</label>
-                                        <div class="FiltrLabel">
-                                            <label>Оценка: </label>
-                                            <label>@Model.Related[i].Anime.Score</label>
+                                        <div>
+                                            <div class="FiltrLabel">
+                                                <label>@Model.Related[i].Anime.Russian</label>
+                                            </div>
+                                            <label>@Model.Related[i].Anime.Kind@(
+                                    "/"
+                                    )@Model.Related[i].Anime.Status</label>
+                                            <div class="FiltrLabel">
+                                                <label>Оценка: </label>
+                                                <label>@Model.Related[i].Anime.Score</label>
+                                            </div>
+                                            <form method="post" asp-page="AnimeId">
+                                                <input type="submit" value="Подробнее" asp-page-handler="AnimeIdPage" asp-route-id="@Model.Related[i].Anime.Id" />
+                                            </form>
                                         </div>
-                                        <form method="post" asp-page="AnimeId">
-                                            <input type="submit" value="Подробнее" asp-page-handler="AnimeIdPage" asp-route-id="@Model.Related[i].Anime.Id" />
-                                        </form>
                                     </div>
-                                </div>
+                                }
+                                else if (Model.Related[i].Manga != null)
+                                {
+                                    <div class="RelatedManga">
+                                        <div class="ImageAndSelect">
+                                            <img src=@("https://shikimori.me")@Model.Related[i].Manga.Image.Original alt="Отсутствует">
+                                            @if (Model.Related[i].Manga.Kind == "light_novel")
+                                            {
+                                                <form method="post" action="@Url.Action("AddRanobeToList", "Home")">
+                                                    <select name="selectedList" action="@Url.Action("AddRanobeToList", "Home")"
+                                            asp-for="SelectedLists[i]" onchange="this.form.submit()">
+                                                        <option value="0 @Model.Related[i].Manga.Id">Нет</option>
+                                                        <option value="1 @Model.Related[i].Manga.Id">Читаю</option>
+                                                        <option value="2 @Model.Related[i].Manga.Id">В планах</option>
+                                                        <option value="3 @Model.Related[i].Manga.Id">Брошено</option>
+                                                        <option value="4 @Model.Related[i].Manga.Id">Прочитано</option>
+                                                        <option value="5 @Model.Related[i].Manga.Id">Любимые</option>
+                                                    </select>
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form method="post" action="@Url.Action("AddMangaToList", "Home")">
+                                                    <select name="selectedList" action="@Url.Action("AddMangaToList", "Home")"
+                                            asp-for="SelectedLists[i]" onchange="this.form.submit()">
+                                                        <option value="0 @Model.Related[i].Manga.Id">Нет</option>
+                                                        <option value="1 @Model.Related[i].Manga.Id">Читаю</option>
+                                                        <option value="2 @Model.Related[i].Manga.Id">В планах</option>
+                                                        <option value="3 @Model.Related[i].Manga.Id">Брошено</option>
+                                                        <option value="4 @Model.Related[i].Manga.Id">Прочитано</option>
+                                                        <option value="5 @Model.Related[i].Manga.Id">Любимые</option>
+                                                    </select>
+                                                </form>
+                                            }
+                                        </div>
+                                        <div>
+                                            <div class="FiltrLabel">
+                                                <label>@Model.Related[i].Manga.Russian</label>
+                                            </div>
+                                            <label>@Model.Related[i].Manga.Kind@(
+                                    "/"
+                                    )@Model.Related[i].Manga.Status</label>
+                                            <div class="FiltrLabel">
+                                                <label>Оценка: </label>
+                                                <label>@Model.Related[i].Manga.Score</label>
+                                            </div>
+                                            @if (Model.Related[i].Manga.Kind == "light_novel")
+                                            {
+                                                <form method="post" asp-page="RanobeId">
+                                                    <input type="submit" value="Подробнее" asp-page-handler="RanobeIdPage" asp-route-id="@Model.Related[i].Manga.Id" />
+                                                </form>
+                                            }
+                                            else
+                                            {
+                                                <form method="post" asp-page="MangaId">
+                                                    <input type="submit" value="Подробнее" asp-page-handler="MangaIdPage" asp-route-id="@Model.Related[i].Manga.Id" />
+                                                </form>
+                                            }
+                                        </div>
+                                    </div>
+                                }
                             }
-                            else if (Model.Related[i].Manga != null)
+                        </div>
+                    }
+                    @if (Model.Similar.Count != 0)
+                    {
+                        <label id="SimilarLabel">Похожее</label>
+                        <div class="Similar">
+                            @if (Model.Similar.Count() != 0)
                             {
-                                <div class="RelatedManga">
-                                    <div class="ImageAndSelect">
-                                        <img src=@("https://shikimori.me")@Model.Related[i].Manga.Image.Original alt="Отсутствует">
-                                        @if (Model.Related[i].Manga.Kind == "light_novel")
-                                        {
+                                for (int i = 0; i < (Model.Similar.Count() > 8 ? 8 : Model.Similar.Count()); i++)
+                                {
+                                    <div class="SimilarPiece">
+                                        <div class="ImageAndSelect">
+                                            <img src=@("https://shikimori.me")@Model.Similar[i].Image.Original alt="Отсутствует">
                                             <form method="post" action="@Url.Action("AddRanobeToList", "Home")">
                                                 <select name="selectedList" action="@Url.Action("AddRanobeToList", "Home")"
-                                            asp-for="SelectedLists[i]" onchange="this.form.submit()">
-                                                    <option value="0 @Model.Related[i].Manga.Id">Нет</option>
-                                                    <option value="1 @Model.Related[i].Manga.Id">Читаю</option>
-                                                    <option value="2 @Model.Related[i].Manga.Id">В планах</option>
-                                                    <option value="3 @Model.Related[i].Manga.Id">Брошено</option>
-                                                    <option value="4 @Model.Related[i].Manga.Id">Прочитано</option>
-                                                    <option value="5 @Model.Related[i].Manga.Id">Любимые</option>
-                                                </select>
-                                            </form>
-                                        }
-                                        else
-                                        {
-                                            <form method="post" action="@Url.Action("AddMangaToList", "Home")">
-                                                <select name="selectedList" action="@Url.Action("AddMangaToList", "Home")"
-                                            asp-for="SelectedLists[i]" onchange="this.form.submit()">
-                                                    <option value="0 @Model.Related[i].Manga.Id">Нет</option>
-                                                    <option value="1 @Model.Related[i].Manga.Id">Читаю</option>
-                                                    <option value="2 @Model.Related[i].Manga.Id">В планах</option>
-                                                    <option value="3 @Model.Related[i].Manga.Id">Брошено</option>
-                                                    <option value="4 @Model.Related[i].Manga.Id">Прочитано</option>
-                                                    <option value="5 @Model.Related[i].Manga.Id">Любимые</option>
-                                                </select>
-                                            </form>
-                                        }
-                                    </div>
-                                    <div>
-                                        <div class="FiltrLabel">
-                                            <label>@Model.Related[i].Manga.Russian</label>
-                                        </div>
-                                        <label>@Model.Related[i].Manga.Kind@("/")@Model.Related[i].Manga.Status</label>
-                                        <div class="FiltrLabel">
-                                            <label>Оценка: </label>
-                                            <label>@Model.Related[i].Manga.Score</label>
-                                        </div>
-                                        @if (Model.Related[i].Manga.Kind == "light_novel")
-                                        {
-                                            <form method="post" asp-page="RanobeId">
-                                                <input type="submit" value="Подробнее" asp-page-handler="RanobeIdPage" asp-route-id="@Model.Related[i].Manga.Id" />
-                                            </form>
-                                        }
-                                        else
-                                        {
-                                            <form method="post" asp-page="MangaId">
-                                                <input type="submit" value="Подробнее" asp-page-handler="MangaIdPage" asp-route-id="@Model.Related[i].Manga.Id" />
-                                            </form>
-                                        }
-                                    </div>
-                                </div>
-                            }
-                        }
-                    </div>
-
-                    <label id="SimilarLabel">Похожее</label>
-                    <div class="Similar">
-                        @if (Model.Similar.Count() != 0)
-                        {
-                            for (int i = 0; i < (Model.Similar.Count() > 8 ? 8 : Model.Similar.Count()); i++)
-                            {
-                                <div class="SimilarPiece">
-                                    <div class="ImageAndSelect">
-                                        <img src=@("https://shikimori.me")@Model.Similar[i].Image.Original alt="Отсутствует">
-                                        <form method="post" action="@Url.Action("AddRanobeToList", "Home")">
-                                            <select name="selectedList" action="@Url.Action("AddRanobeToList", "Home")"
                                             asp-for="SimilarRanobeList[i]" onchange="this.form.submit()">
-                                                <option value="0 @Model.Similar[i].Id">Нет</option>
-                                                <option value="1 @Model.Similar[i].Id">Читаю</option>
-                                                <option value="2 @Model.Similar[i].Id">В планах</option>
-                                                <option value="3 @Model.Similar[i].Id">Брошено</option>
-                                                <option value="4 @Model.Similar[i].Id">Прочитано</option>
-                                                <option value="5 @Model.Similar[i].Id">Любимые</option>
-                                            </select>
-                                        </form>
-                                    </div>
-                                    <div class="SimilarInformation">
-                                        <label>@Model.Similar[i].Russian</label>
-                                        <label>@Model.Similar[i].Kind@("/")@Model.Similar[i].Status</label>
-                                        <div class="FiltrLabel">
-                                            <label>Оценка: </label>
-                                            <label>@Model.Similar[i].Score</label>
+                                                    <option value="0 @Model.Similar[i].Id">Нет</option>
+                                                    <option value="1 @Model.Similar[i].Id">Читаю</option>
+                                                    <option value="2 @Model.Similar[i].Id">В планах</option>
+                                                    <option value="3 @Model.Similar[i].Id">Брошено</option>
+                                                    <option value="4 @Model.Similar[i].Id">Прочитано</option>
+                                                    <option value="5 @Model.Similar[i].Id">Любимые</option>
+                                                </select>
+                                            </form>
                                         </div>
-                                        <form method="post" asp-page="RanobeId">
-                                            <input type="submit" value="Подробнее" asp-page-handler="RanobeIdPage" asp-route-id="@Model.Similar[i].Id" />
-                                        </form>
+                                        <div class="SimilarInformation">
+                                            <label>@Model.Similar[i].Russian</label>
+                                            <label>@Model.Similar[i].Kind@(
+                                    "/"
+                                    )@Model.Similar[i].Status</label>
+                                            <div class="FiltrLabel">
+                                                <label>Оценка: </label>
+                                                <label>@Model.Similar[i].Score</label>
+                                            </div>
+                                            <form method="post" asp-page="RanobeId">
+                                                <input type="submit" value="Подробнее" asp-page-handler="RanobeIdPage" asp-route-id="@Model.Similar[i].Id" />
+                                            </form>
+                                        </div>
                                     </div>
-                                </div>
+                                }
                             }
-                        }
-                    </div>
+                        </div>
+                    }
                 </div>
 
             </div>

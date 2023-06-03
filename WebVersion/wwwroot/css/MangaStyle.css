@@ -29,10 +29,17 @@
         border: 3px solid black;
     }
 
+    .MangaContainer input {
+        background-color: #1D252A;
+        border: 1px solid white;
+        color: white;
+        margin-left: 15px;
+    }
+
 .PictureAndListContainer {
     display: flex;
     flex-direction: column;
-    margin: 10px;
+    margin: 5px 0px;
     justify-content: center;
     align-items: flex-start;
 }
@@ -92,7 +99,7 @@
     border-radius: 10px;
     margin: 20px;
     align-self: first baseline;
-    margin-top: 50px;
+    margin-top: 120px;
 }
 
     .FiltrContainer label {
@@ -122,7 +129,8 @@ input {
 #PagesSelect {
     font-size: 20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    width: 50px;
+    width: fit-content;
     border: none;
     color: black;
+    align-self: center;
 }

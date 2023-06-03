@@ -33,12 +33,6 @@
                         <label id="AnimeEnglishName">@Model.MangaList[i].Name</label>
                         <label class="OtherInformation">@Model.MangaList[i].Kind @("/") @Model.MangaList[i].Status</label>
                         <label class="OtherInformation">@("Оценка:") @Model.MangaList[i].Score</label>
-                        <label class="OtherInformation">
-                            @foreach (var genre in Model.MangaList[i].Genres)
-                            {
-                                @($"{genre.Russian} ")
-                            }
-                        </label>
                     </div>
                     <input type="submit" value="Подробнее" asp-page-handler="MangaIdPage" asp-route-id="@Model.MangaList[i].Id" />
                 </form>
@@ -65,7 +59,7 @@
 
         <div class="UserContainer">
 
-            <img src=@User.FindFirstValue(ClaimTypes.UserData) />
+            <img src=@User.FindFirstValue(ClaimTypes.Surname) />
 
             <label>@User.Identity.Name</label>
 

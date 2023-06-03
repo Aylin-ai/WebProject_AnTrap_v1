@@ -215,7 +215,7 @@ namespace WebVersion.Pages
                         int userList = 0;
                         switch (data.userList)
                         {
-                            case "Читаю":
+                            case "Смотрю":
                                 userList = 1;
                                 break;
                             case "В планах":
@@ -224,7 +224,7 @@ namespace WebVersion.Pages
                             case "Брошено":
                                 userList = 3;
                                 break;
-                            case "Прочитано":
+                            case "Просмотрено":
                                 userList = 4;
                                 break;
                             case "Любимое":

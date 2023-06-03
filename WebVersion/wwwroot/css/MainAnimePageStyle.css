@@ -29,10 +29,17 @@
     border: 3px solid black;
 }
 
+    .AnimeContainer input {
+        background-color: #1D252A;
+        border: 1px solid white;
+        color: white;
+        margin-left: 15px;
+    }
+
 .PictureAndListContainer {
     display: flex;
     flex-direction: column;
-    margin: 10px;
+    margin: 5px 0px;
     justify-content: center;
     align-items: flex-start;
 }
@@ -83,17 +90,17 @@
     }
 
 
-    .FiltrContainer {
-        position: sticky;
-        top: 100px;
-        display: flex;
-        flex-direction: column;
-        background-color: #1D252A;
-        border-radius: 10px;
-        margin: 20px;
-        align-self: first baseline;
-        margin-top: 50px;
-    }
+.FiltrContainer {
+    position: sticky;
+    top: 100px;
+    display: flex;
+    flex-direction: column;
+    background-color: #1D252A;
+    border-radius: 10px;
+    margin: 20px;
+    align-self: first baseline;
+    margin-top: 120px;
+}
 
 .FiltrContainer label {
     border: none;
@@ -122,9 +129,10 @@ input {
 #PagesSelect {
     font-size: 20px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    width: 50px;
+    width: fit-content;
     border: none;
     color: black;
+    align-self: center;
 }
 
 
