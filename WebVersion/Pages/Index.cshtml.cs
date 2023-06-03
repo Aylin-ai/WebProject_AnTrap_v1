@@ -1,19 +1,13 @@
-﻿using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MySql.Data.MySqlClient;
-using ShikimoriSharp.Classes;
 using System.Security.Claims;
 using WebVersion.AdditionalClasses;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using Microsoft.AspNetCore.Builder.Extensions;
 using FirebaseAdmin;
-using Google.Apis.Auth.OAuth2;
 using FirebaseAdmin.Auth;
-using Firebase.Auth.Providers;
-using static Google.Apis.Auth.OAuth2.Web.AuthorizationCodeWebApp;
+using Firebase.Database;
+using System.Text;
 
 namespace WebVersion.Pages
 {
@@ -88,6 +82,41 @@ namespace WebVersion.Pages
                     userName = user.DisplayName;
                     _userImage = user.PhotoUrl;
 
+                    var firebase = new FirebaseClient("https://antrap-firebase-default-rtdb.firebaseio.com/");
+                    var httpClient = new HttpClient();
+                    var databaseUrl = "https://antrap-firebase-default-rtdb.firebaseio.com/";
+                    var nodePath = $"users/{Email.Replace('.', ',')}.json";
+                    User newUser = new User()
+                    {
+                        Id = userId,
+                        Login = user.DisplayName,
+                        Email = Email,
+                        ImageSource = user.PhotoUrl,
+                    };
+                    // Преобразуйте объект с данными в JSON строку
+                    var jsonData = Newtonsoft.Json.JsonConvert.SerializeObject(newUser);
+
+                    // Создайте HTTP запрос типа POST
+                    var request = new HttpRequestMessage(HttpMethod.Put, $"{databaseUrl}{nodePath}")
+                    {
+                        Content = new StringContent(jsonData)
+                    };
+
+                    // Установите заголовок "Content-Type" для указания типа содержимого
+                    request.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+                    // Отправьте HTTP запрос и получите ответ
+                    var response = await httpClient.SendAsync(request);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine("Данные успешно отправлены в Firebase Realtime Database.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Произошла ошибка при отправке данных: {response.StatusCode}");
+                    }
+
                     // Обработка успешной регистрации и полученных данных пользователя
                     var claims = new List<Claim>
                                 {
@@ -154,13 +183,13 @@ namespace WebVersion.Pages
                                 var auth = FirebaseAuth.GetAuth(app);
                                 var user = await auth.GetUserByEmailAsync(Email);
 
-                                idToken = result.idToken;
                                 localId = user.Uid;
                                 userEmail = user.Email;
                                 userName = user.DisplayName;
                                 refreshIdToken = result.refreshToken;
                                 _userImage = user.PhotoUrl;
-                                _role = 1;
+                                _role = 2;
+                                FirebaseAppProvider.FIREBASE_ID_TOKEN = result.idToken;
                             }
                             catch (FirebaseAuthException ex)
                             {

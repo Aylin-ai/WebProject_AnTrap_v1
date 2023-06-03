@@ -24,7 +24,7 @@
                 <a><label>AnTrap</label></a>
             }
             <form method="post" action="@Url.Action("Selected", "Home")">
-                <select name="selectedValue" onchange="this.form.submit()">
+                <select id="selectPiece" name="selectedValue" onchange="this.form.submit()">
                     <option value="0"></option>
                     <option value="anime">Аниме</option>
                     <option value="manga">Манга</option>

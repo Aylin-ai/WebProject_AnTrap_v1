@@ -1,92 +1,80 @@
+using Firebase.Database;
+using FirebaseAdmin;
+using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using MySql.Data.MySqlClient;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using WebVersion.AdditionalClasses;
 
 namespace WebVersion.Pages
 {
     public class UserListModel : PageModel
     {
-        public List<User> Users { get; set; } = new List<User>();
+        private FirebaseApp app;
+        public List<User> Users { get; set; }
 
-        public void OnGet()
+        public UserListModel()
         {
-            if (User.Identity.IsAuthenticated)
-            {
-                GetUsers();
-            }
+            app = FirebaseAppProvider.GetFirebaseApp();
+            Task.Run(GetUsers);
         }
 
-        public async Task<IActionResult> OnPostDeleteUser(int id)
+        public async void OnGetAsync()
         {
-            MySqlConnection conn = DBUtils.GetDBConnection();
-            conn.Open();
+        }
 
+        public async Task<IActionResult> OnPostDeleteUser(string id)
+        {
+            FirebaseAuth auth = FirebaseAuth.GetAuth(app);
+            var httpClient = new HttpClient();
+            var databaseUrl = "https://antrap-firebase-default-rtdb.firebaseio.com/";
+            var user = await auth.GetUserAsync(id);
+            var nodePath = $"users/{user.Email.Replace('.', ',')}.json";
             try
             {
-                MySqlCommand cmd = new MySqlCommand();
-                cmd.Connection = conn;
+                var userId = id;
+                await auth.DeleteUserAsync(userId);
 
-                string sql = "delete from userinformation where Id = @id";
-                cmd.CommandText = sql;
+                var request = new HttpRequestMessage(HttpMethod.Delete, $"{databaseUrl}{nodePath}");
 
-                cmd.Parameters.AddWithValue("@id", id);
+                // Отправьте HTTP запрос и получите ответ
+                var response = await httpClient.SendAsync(request);
 
-                await cmd.ExecuteNonQueryAsync();
+                // Проверьте статусный код ответа
+                if (response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Данные успешно удалены из Firebase Realtime Database.");
+                }
+                else
+                {
+                    Console.WriteLine($"Произошла ошибка при удалении данных: {response.StatusCode}");
+                }
+
                 return RedirectToPage("UserList");
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.Message);
             }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
-            }
         }
 
-        public void GetUsers()
+        public async Task GetUsers()
         {
-            MySqlConnection conn = DBUtils.GetDBConnection();
-            conn.Open();
-
+            List<User> users = new List<User>();
+            var firebase = new FirebaseClient("https://antrap-firebase-default-rtdb.firebaseio.com/");
             try
             {
-                MySqlCommand cmd = new MySqlCommand();
-                cmd.Connection = conn;
-
-                string sql = "select * from userinformation where UserRole_Id = 1";
-                cmd.CommandText = sql;
-
-                var users = new List<User>();
-
-                var reader = cmd.ExecuteReader();
-
-                if (reader.HasRows)
+                var result = await firebase.Child("users").OnceAsync<User>();
+                foreach (var user in result)
                 {
-                    while (reader.Read())
-                    {
-                        users.Add(new User()
-                        {
-                            Id = reader.GetInt32(0),
-                            Login = reader.GetString(1),
-                            Password = reader.GetString(2),
-                            Email = reader.GetString(3),
-                            ImageSource = reader.GetString(4),
-                        });
-                    }
-                    Users = users;
+                    users.Add(user.Object);
                 }
+                Users = users;
+
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
-            }
-            finally
-            {
-                conn.Close();
-                conn.Dispose();
+                Console.WriteLine($"Ошибка: {ex.Message}");
             }
         }
     }

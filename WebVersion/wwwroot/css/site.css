@@ -63,3 +63,11 @@ body {
 .Body-Content {
     margin: 30px;
 }
+
+#selectPiece {
+    background-color: #1D252A;
+    border-color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    color: white;
+}

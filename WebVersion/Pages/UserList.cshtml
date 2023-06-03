@@ -2,42 +2,6 @@
 @model WebVersion.Pages.UserListModel
 @using System.Security.Claims;
 @{
-
-    async Task GetUsers()
-    {
-        for (int i = 0; i < Model.Users.Count; i++)
-        {
-            <div class="AnimeContainer">
-
-                <div class="PictureAndListContainer">
-
-                    <img src=@Model.Users[i].ImageSource alt="Отсутствует" style="width:150px; height:150px;">
-
-                </div>
-
-                <div style="display:flex; flex-direction:column;">
-                    <div class="AnimeInformation">
-                        <label id="AnimeName">@Model.Users[i].Login</label>
-                        <label id="AnimeEnglishName">@("Id - ")@Model.Users[i].Id</label>
-                        <label class="OtherInformation">@("Email - ")@Model.Users[i].Email</label>
-                        <label class="OtherInformation">@("Пароль - ") @Model.Users[i].Password</label>
-                    </div>
-                    <div style="display:flex;">
-                        <form method="post">
-                            <button type="submit" asp-page-handler="DeleteUser" asp-route-id="@Model.Users[i].Id">Удалить</button>
-                        </form>
-                        <form method="post" action="@Url.Action("SendNotify", "Home")">
-                            <button name="userId" action="@Url.Action("SendNotify", "Home")" value=@Model.Users[i].Id>Отправить уведомление</button>
-                        </form>
-                    </div>
-                </div>
-
-            </div>
-
-            <hr>
-        }
-    }
-
 }
 
 <html>
@@ -54,7 +18,7 @@
 
         <div class="UserContainer">
 
-            <img src=@User.FindFirstValue(ClaimTypes.UserData) alt="Отсутствует">
+            <img src=@User.FindFirstValue(ClaimTypes.Surname) alt="Отсутствует">
 
             <label>@User.Identity.Name</label>
 
@@ -70,8 +34,34 @@
 
             <div class="AnimeListContainer">
 
-                @{
-                    await GetUsers();
+                @while (Model.Users == null)
+                {
+                    continue;
+                }
+                @foreach (var user in Model.Users)
+                {
+                    <div class="AnimeContainer">
+                        <div class="PictureAndListContainer">
+                            <img src="@user.ImageSource" alt="Отсутствует" style="width:150px; height:150px;">
+                        </div>
+                        <div style="display:flex; flex-direction:column;">
+                            <div class="AnimeInformation">
+                                <label id="AnimeName">@user.Login</label>
+                                <label id="AnimeEnglishName">@("Id - ")@user.Id</label>
+                                <label class="OtherInformation">@("Email - ")@user.Email</label>
+                                <label class="OtherInformation">@("Имя - ")@user.Login</label>
+                            </div>
+                            <div style="display:flex;">
+                                <form method="post">
+                                    <button type="submit" asp-page-handler="DeleteUser" asp-route-id="@user.Id">Удалить</button>
+                                </form>
+                                <form method="post" action="@Url.Action("SendNotify", "Home")">
+                                    <button name="userId" action="@Url.Action("SendNotify", "Home")" value="@user.Id">Отправить уведомление</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <hr>
                 }
 
             </div>

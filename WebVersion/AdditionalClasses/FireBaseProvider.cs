@@ -6,6 +6,7 @@ namespace WebVersion.AdditionalClasses
     public class FirebaseAppProvider
     {
         private static FirebaseApp _app;
+        public static string FIREBASE_ID_TOKEN;
 
         public static FirebaseApp GetFirebaseApp()
         {
