@@ -27,9 +27,8 @@ namespace WebVersion.Pages
         private string refreshIdToken = "";
         private FirebaseApp app;
 
-        public IndexModel(ILogger<IndexModel> logger, IHttpContextAccessor httpContextAccessor)
+        public IndexModel(IHttpContextAccessor httpContextAccessor)
         {
-            _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             app = FirebaseAppProvider.GetFirebaseApp();
         }

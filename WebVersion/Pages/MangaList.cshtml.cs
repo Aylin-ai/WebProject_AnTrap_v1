@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using MySql.Data.MySqlClient;
 using ShikimoriSharp.Classes;
+using System.Net.Http;
 using System.Security.Claims;
 using WebVersion.AdditionalClasses;
 
@@ -49,28 +50,20 @@ namespace WebVersion.Pages
             return RedirectToPage("/UserProfile");
         }
 
-        public async Task GetManga(string selectedList = "Читаю")
+        public async Task<IEnumerable<FirebaseObject<PieceInList>>> GetManga(string selectedList = "Читаю", string Email = null)
         {
-            var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync("MyCookieAuthenticationScheme");
+            HttpClient httpClient = _httpClientFactory.CreateClient();
+            httpClient.BaseAddress = new Uri("https://shikimori.me");
+            httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("User-Agent", "ShikiOAuthTest");
 
-            if (authenticateResult.Succeeded && authenticateResult.Principal != null)
+            if (Email != null)
             {
-                HttpClient httpClient = _httpClientFactory.CreateClient();
-                httpClient.BaseAddress = new Uri("https://shikimori.me");
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("User-Agent", "ShikiOAuthTest");
-
-                MangaList.Clear();
-
-                var principal1 = authenticateResult.Principal;
-
-                // Получение утверждения имени пользователя
-                var emailClaim = principal1.FindFirst(ClaimTypes.Email);
-                var email = emailClaim?.Value;
                 var firebase = new FirebaseClient("https://antrap-firebase-default-rtdb.firebaseio.com/");
                 try
                 {
                     var result = await firebase.Child("manga").OnceAsync<PieceInList>();
-                    var filteredResult = result.Where(item => item.Object.userEmail == email && item.Object.userList == selectedList);
+                    var filteredResult = result.Where(item => item.Object.userEmail == Email && item.Object.userList == selectedList);
+                    var mangaList = new List<MangaID>();
                     foreach (var item in filteredResult)
                     {
                         var data = item.Object; // Данные из базы данных
@@ -93,14 +86,70 @@ namespace WebVersion.Pages
                                 userList = 5;
                                 break;
                         }
-                        MangaList.Add(await httpClient.GetFromJsonAsync<MangaID>($"/api/mangas/{data.pieceId}"));
+                        mangaList.Add(await httpClient.GetFromJsonAsync<MangaID>($"/api/mangas/{data.pieceId}"));
                         SelectedList.Add($"{userList} {data.pieceId}");
                     }
+                    return filteredResult;
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
+                    return null;
                 }
+            }
+            else
+            {
+                var authenticateResult = await _httpContextAccessor.HttpContext.AuthenticateAsync("MyCookieAuthenticationScheme");
+
+                if (authenticateResult.Succeeded && authenticateResult.Principal != null)
+                {
+
+                    MangaList.Clear();
+
+                    var principal1 = authenticateResult.Principal;
+
+                    // Получение утверждения имени пользователя
+                    var emailClaim = principal1.FindFirst(ClaimTypes.Email);
+                    var email = emailClaim?.Value;
+                    var firebase = new FirebaseClient("https://antrap-firebase-default-rtdb.firebaseio.com/");
+                    try
+                    {
+                        var result = await firebase.Child("manga").OnceAsync<PieceInList>();
+                        var filteredResult = result.Where(item => item.Object.userEmail == email && item.Object.userList == selectedList);
+                        foreach (var item in filteredResult)
+                        {
+                            var data = item.Object; // Данные из базы данных
+                            int userList = 0;
+                            switch (data.userList)
+                            {
+                                case "Читаю":
+                                    userList = 1;
+                                    break;
+                                case "В планах":
+                                    userList = 2;
+                                    break;
+                                case "Брошено":
+                                    userList = 3;
+                                    break;
+                                case "Прочитано":
+                                    userList = 4;
+                                    break;
+                                case "Любимое":
+                                    userList = 5;
+                                    break;
+                            }
+                            MangaList.Add(await httpClient.GetFromJsonAsync<MangaID>($"/api/mangas/{data.pieceId}"));
+                            SelectedList.Add($"{userList} {data.pieceId}");
+                        }
+                        return filteredResult;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                        return null;
+                    }
+                }
+                return null;
             }
         } 
     }
