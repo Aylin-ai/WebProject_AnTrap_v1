@@ -55,9 +55,6 @@
                                 <form method="post">
                                     <button type="submit" asp-page-handler="DeleteUser" asp-route-id="@user.Id">Удалить</button>
                                 </form>
-                                <form method="post" action="@Url.Action("SendNotify", "Home")">
-                                    <button name="userId" action="@Url.Action("SendNotify", "Home")" value="@user.Id">Отправить уведомление</button>
-                                </form>
                             </div>
                         </div>
                     </div>

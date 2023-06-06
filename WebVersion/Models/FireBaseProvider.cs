@@ -14,7 +14,7 @@ namespace WebVersion.Models
             {
                 _app = FirebaseApp.Create(new AppOptions
                 {
-                    Credential = GoogleCredential.FromFile("D:\\Учеба\\4335\\Проект\\База данных\\antrap-firebase-firebase-adminsdk-oc7cx-6e72638be5.json")
+                    Credential = GoogleCredential.FromFile("C:\\Users\\ajlin\\Desktop\\antrap-firebase-firebase-adminsdk-oc7cx-6e72638be5.json")
                 });
             }
 
