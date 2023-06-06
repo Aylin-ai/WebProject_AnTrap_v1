@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using System.Security.Claims;
-using WebVersion.AdditionalClasses;
+using WebVersion.Models;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
 using WebVersion.Pages;

@@ -1,7 +1,7 @@
 ﻿using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
 
-namespace WebVersion.AdditionalClasses
+namespace WebVersion.Models
 {
     public class FirebaseAppProvider
     {

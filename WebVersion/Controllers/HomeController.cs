@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MySql.Data.MySqlClient;
 using Microsoft.AspNetCore.Authentication;
-using WebVersion.AdditionalClasses;
+using WebVersion.Models;
 using Microsoft.AspNetCore.SignalR;
 using FirebaseAdmin;
 using Firebase.Database;

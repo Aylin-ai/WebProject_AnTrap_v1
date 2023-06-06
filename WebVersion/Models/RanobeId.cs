@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using ShikimoriSharp.Classes;
 
-namespace WebVersion.AdditionalClasses
+namespace WebVersion.Models
 {
     public class RanobeId : RanobeIdBase
     {

@@ -1,12 +1,12 @@
 ﻿using MySql.Data.MySqlClient;
 using ShikimoriSharp.Bases;
 using System.Data.Common;
-using WebVersion.AdditionalClasses;
 
 namespace WebVersion.Models
 {
     public static class APIToken
     {
+        /*
         private static string connectionString = "Server=DESKTOP-H0P5N48;Database=AnTrap;Trusted_Connection=True;";
         private const char V = '"';
         private static IHttpClientFactory _httpClientFactory;
@@ -157,5 +157,6 @@ namespace WebVersion.Models
                 conn.Dispose();
             }
         }
+        */
     }
 }

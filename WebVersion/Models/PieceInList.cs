@@ -1,4 +1,4 @@
-﻿namespace WebVersion.AdditionalClasses
+﻿namespace WebVersion.Models
 {
     public class PieceInList
     {

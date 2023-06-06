@@ -1,4 +1,4 @@
-using WebVersion.AdditionalClasses;
+using WebVersion.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 

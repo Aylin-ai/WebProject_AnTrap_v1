@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using ShikimoriSharp.Bases;
 
-namespace WebVersion.AdditionalClasses
+namespace WebVersion.Models
 {
     public class RanobeBase : SmallRepresentation
     {

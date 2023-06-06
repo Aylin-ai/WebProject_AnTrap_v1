@@ -2,7 +2,7 @@
 using ShikimoriSharp.Bases;
 using ShikimoriSharp.Classes;
 
-namespace WebVersion.AdditionalClasses
+namespace WebVersion.Models
 {
     public class RanobeIdBase : RanobeBase
     {

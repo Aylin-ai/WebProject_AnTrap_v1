@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.SignalR;
 using MySqlX.XDevAPI;
 
-namespace WebVersion.AdditionalClasses
+namespace WebVersion.Models
 {
     [Authorize]
     public class NotificationHub : Hub

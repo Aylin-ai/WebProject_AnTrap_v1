@@ -4,7 +4,7 @@ using FirebaseAdmin.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using WebVersion.AdditionalClasses;
+using WebVersion.Models;
 
 namespace WebVersion.Pages
 {

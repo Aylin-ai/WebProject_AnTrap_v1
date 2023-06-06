@@ -9,7 +9,7 @@ using MySql.Data.MySqlClient;
 using ShikimoriSharp.Bases;
 using ShikimoriSharp.Classes;
 using System.Security.Claims;
-using WebVersion.AdditionalClasses;
+using WebVersion.Models;
 
 namespace WebVersion.Pages
 {

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace WebVersion.AdditionalClasses
+namespace WebVersion.Models
 {
     public class Ranobe : RanobeBase
     {

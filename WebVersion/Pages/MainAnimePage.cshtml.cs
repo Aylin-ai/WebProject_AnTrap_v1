@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using ShikimoriSharp.Classes;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using WebVersion.AdditionalClasses;
+using WebVersion.Models;
 using Firebase.Database;
 using System.Security.Claims;
 using FirebaseAdmin;
